@@ -2,7 +2,7 @@
 
 This application is a multi-page platform for displaying movie and television data. The application includes movie details, trailers, theater data, channel ratings and daily streaming data.
 
-![Screenshot_1](https://github.com/user-attachments/assets/65b2c2fb-fc8d-4d04-b205-4e2b66bec30e)
+![Screenshot_1](https://github.com/user-attachments/assets/84b6b56a-8058-4f7f-9834-dbfff172c520)
 
 
 
