@@ -31,7 +31,7 @@ var
     
  
    //Json Verileri
- void jsonYukleNo ; 
+ void jsonYukle ; 
  {   
    qry = TCLJSONQuery.Create(nil);
  qry = Clomosy.ClDataSetFromJSON('[
@@ -362,7 +362,7 @@ void Gecisler
  uRating = TclUnit.Create;
  
  
- jsonYukleNo;
+ jsonYukle;
  SetSearchEdit;
  CreateListView;
  CreateDesignerPanel;
