@@ -1,0 +1,641 @@
+
+Var   
+  uFragmanliFilm:TclForm;
+  ListView : TClProListView;
+  DesignerPanel : TClListViewDesignerPanel;
+  name1,year,sty,times,dir,sce,pla,teaser : TclProLabel;
+  img : TclProImage;
+  searchEdt : TClProSearchEdit;
+  gonder : String;//tıklandığında film fragmanlarının adreslerini taşımak için
+  uFragman,uAnaSayfa,uKanallar,uRating,uTiyatro : TclUnit;
+  btn1,btn2,btn3,btn4,btn5 : TClProButton;
+  panel: TclProPanel;
+  
+
+//Fragmana giden fonksiyon
+void GotoFragman
+{
+  
+    gonder = ListView.clSelectedItemData(clText6); 
+    
+    Clomosy.GlobalVariableString = gonder; 
+    
+    uFragmanliFilm.clShow;
+    uFragman.UnitName = 'Fragman';
+    uFragman.CallerForm = uFragmanliFilm;
+    uFragman.Run;
+}
+
+//Anasayfaya giden fonksiyon
+void GotoAnaSayfa
+{
+    uFragmanliFilm.clShow;
+    uAnaSayfa.UnitName = 'AnaSayfa';
+    uAnaSayfa.CallerForm = uFragmanliFilm;
+    uAnaSayfa.Run;
+}
+
+
+//Kanal sayfasına gitmek için
+void GotoKanallar
+{
+    uFragmanliFilm.clShow;
+    uKanallar.UnitName = 'Kanallar';
+    uKanallar.CallerForm = uFragmanliFilm;
+    uKanallar.Run;
+}
+
+//Rating sayfasına gitmek için
+void GotoRating
+{
+    uFragmanliFilm.clShow;
+    uRating.UnitName = 'Rating';
+    uRating.CallerForm = uFragmanliFilm;
+    uRating.Run;
+}
+
+//Tiyatro sayfasına gitmek için
+void GotoTiyatro
+{
+    uFragmanliFilm.clShow;
+    uTiyatro.UnitName = 'Tiyatro';
+    uTiyatro.CallerForm = uFragmanliFilm;
+    uTiyatro.Run;
+}
+
+//listview oluşturma
+void CreateListView
+{
+  ListView = uFragmanliFilm.AddNewProListView(uFragmanliFilm,'ListView');
+  ListView.Align = AlClient;
+  ListView.Height = 150;
+  ListView.Margins.Bottom = 5;
+  ListView.Margins.Top = 5;
+  ListView.Margins.Right = 5;
+  ListView.Margins.Left = 5;
+  ListView.clProSettings.ColCount = 1;
+  ListView.clProSettings.ItemHeight = 150;
+  ListView.clProSettings.ItemSpace = 10;
+  ListView.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#FFFCFF');
+  ListView.clProSettings.BorderColor = clAlphaColor.clHexToColor('#66FF7F');
+  ListView.clProSettings.BorderWidth = 2;
+  ListView.clProSettings.RoundHeight = 5;
+  ListView.clProSettings.RoundWidth = 5;
+  ListView.SetclProSettings(ListView.clProSettings);
+  
+  searchEdt.TargetListView = ListView;
+}
+
+void CreateDesignerPanel
+{
+  DesignerPanel = uFragmanliFilm.AddNewProListViewDesignerPanel(ListView, 'DesignerPanel');
+  DesignerPanel.Height = 100;
+  DesignerPanel.Width = 150;
+  DesignerPanel.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#B3FCE5');
+  DesignerPanel.clProSettings.BorderColor = clAlphaColor.clHexToColor('#16FF8C');
+  DesignerPanel.clProSettings.BorderWidth = 2;
+  DesignerPanel.clProSettings.RoundHeight = 20;
+  DesignerPanel.clProSettings.RoundWidth = 20;
+  DesignerPanel.SetclProSettings(DesignerPanel.clProSettings);
+  
+  ListView.SetDesignerPanel(DesignerPanel);
+}
+
+//verileri ListViewde nereye yerleşeceğini ayarlayan fonksiyon
+void CreateData;
+{
+                
+  img = uFragmanliFilm.AddNewProImage(DesignerPanel, 'img');
+  img.Align = AlLeft;
+  img.Margins.Top = 10;
+  img.Margins.Bottom = 10;
+  DesignerPanel.AddPanelObject(img, clImage1);
+
+  name1 = uFragmanliFilm.AddNewProLabel(DesignerPanel, 'name', '');
+  name1.Align = AlVertCenter;
+  name1.Margins.Top = -60;
+  name1.Margins.Right = 10;
+  name1.Margins.Left = 10;
+  name1.clProSettings.FontColor = clAlphaColor.clHexToColor('#000000');
+  name1.clProSettings.FontSize = 9;
+  name1.clProSettings.AutoSize=True;
+  name1.clProSettings.WordWrap=True;
+  name1.SetclProSettings(name1.clProSettings);
+  DesignerPanel.AddPanelObject(name1, clCaption);
+    
+  year = uFragmanliFilm.AddNewProLabel(DesignerPanel, 'year', '');
+  year.Align = AlVertCenter;
+  year.Margins.Top = -20;
+  year.Margins.Right = 10;
+  year.Margins.Left = 10;
+  year.clProSettings.FontColor = clAlphaColor.clHexToColor('#000000');
+  year.clProSettings.FontSize = 9;
+  year.clProSettings.AutoSize=True;
+  year.SetclProSettings(year.clProSettings);
+  DesignerPanel.AddPanelObject(year, clText);  
+  
+  
+  sty = uFragmanliFilm.AddNewProLabel(DesignerPanel, 'sty', '');
+  sty.Align = AlVertCenter;
+  sty.Margins.Top = 5;
+  sty.Margins.Right = 10;
+  sty.Margins.Left = 10;
+  sty.clProSettings.FontColor = clAlphaColor.clHexToColor('#000000');
+  sty.clProSettings.FontSize = 9;
+  sty.clProSettings.AutoSize=True;
+  sty.SetclProSettings(sty.clProSettings);
+  DesignerPanel.AddPanelObject(sty, clText1); 
+  sty.Visible = false;
+  
+  
+  times = uFragmanliFilm.AddNewProLabel(DesignerPanel, 'times', '');
+  times.Align = AlVertCenter;
+  times.Margins.Top = 15;
+  times.Margins.Right = 10;
+  times.Margins.Left = 10;
+  times.clProSettings.FontColor = clAlphaColor.clHexToColor('#000000');
+  times.clProSettings.FontSize = 9;
+  times.clProSettings.AutoSize=True;
+  times.SetclProSettings(times.clProSettings);
+  DesignerPanel.AddPanelObject(times, clText2);  
+  
+  dir = uFragmanliFilm.AddNewProLabel(DesignerPanel, 'dir', '');
+  dir.Align = AlVertCenter;
+  dir.Margins.Top = 40;
+  dir.Margins.Right = 10;
+  dir.Margins.Left = 10;
+  dir.clProSettings.FontColor = clAlphaColor.clHexToColor('#000000');
+  dir.clProSettings.FontSize =9;
+  dir.clProSettings.AutoSize=True;
+  dir.SetclProSettings(dir.clProSettings);
+  DesignerPanel.AddPanelObject(dir, clText3);  
+  
+  sce = uFragmanliFilm.AddNewProLabel(DesignerPanel, 'sce', '');
+  sce.Align = AlVertCenter;
+  sce.Margins.Top = 60;
+  sce.Margins.Right = 10;
+  sce.Margins.Left = 10;
+  sce.clProSettings.FontColor = clAlphaColor.clHexToColor('#000000');
+  sce.clProSettings.FontSize = 9;
+  sce.clProSettings.AutoSize=True;
+  sce.clProSettings.WordWrap=True;
+  sce.SetclProSettings(sce.clProSettings);
+  DesignerPanel.AddPanelObject(sce, clText4);  
+  
+  
+  pla = uFragmanliFilm.AddNewProLabel(DesignerPanel, 'pla', '');
+  pla.Align = AlVertCenter;
+  pla.Margins.Top = 110;
+  pla.Margins.Right = 10;
+  pla.Margins.Left = 10;
+  pla.clProSettings.FontColor = clAlphaColor.clHexToColor('#000000');
+  pla.clProSettings.FontSize = 9;
+  pla.clProSettings.AutoSize=True;
+  pla.clProSettings.WordWrap=True;
+  pla.SetclProSettings(pla.clProSettings);
+  DesignerPanel.AddPanelObject(pla, clText5); 
+  
+  teaser = uFragmanliFilm.AddNewProLabel(DesignerPanel, 'teaser', '');
+  teaser.Align = AlVertCenter;
+  teaser.Margins.Top = 45;
+  teaser.Margins.Right = 10;
+  teaser.Margins.Left = 10;
+  teaser.clProSettings.FontColor = clAlphaColor.clHexToColor('#000000');
+  teaser.clProSettings.FontSize = 9;
+  teaser.clProSettings.AutoSize=True;
+  teaser.SetclProSettings(teaser.clProSettings);
+  DesignerPanel.AddPanelObject(teaser, clText6);  
+  teaser.visible = false;
+  
+  uFragmanliFilm.AddNewEvent(ListView,tbeOnItemClick,'GotoFragman');
+}
+
+void veriAl;
+{
+  ListView.clLoadProListViewDataFromDataset(Clomosy.ClDataSetFromJSON('[
+        {
+                "name": "Hızlı ve Öfkeli 8: Öfkenin Kaderi (The Fate of the Furious)",
+                "year": "Yapım:2017 - ABD",
+                "sty": "Tür:Aksiyon, Gerilim, Suç",
+                "times": "Süre:156 dakika",
+                "dir": "Yönetmen:F. Gary Gray",
+                "sce": "Senaryo:Chris Morgan, Gary Scott Thompson",
+                "pla": "Oyuncular:Vin Diesel, Charlize Theron, Dwayne Johnson, Jason Statham, Michelle Rodriguez",
+                "teaser": "https://www.izlesene.com/embedplayer/9767074",
+                "img": "https://i.imgur.com/Dte2IHZ.jpeg"
+        },
+        {
+                "name": "Karanlık Sular (The Shallows)",
+                "year": "Yapım:2016 - ABD",
+                "sty": "Tür:Gerilim",
+                "times": "Süre:86 dakika",
+                "dir": "Yönetmen:Jaume Collet-Serra",
+                "sce": "Senaryo:Anthony Jaswinski",
+                "pla": "Oyuncular:Blake Lively, Óscar Jaenada, Brett Cullen,Sedona Legge",
+                "teaser": "https://www.izlesene.com/embedplayer/9342898",
+                "img": "https://i.imgur.com/Pccy3I5.jpeg"
+        },
+        {
+                "name": "Örümcek Adam 2 (Spider-Man 2)",
+                "year": "Yapım:2004",
+                "sty": "Tür:Fantastik",
+                "times": "Süre:127 dakika",
+                "dir": "Yönetmen:Sam Raimi",
+                "sce": "Senaryo:Miles Millar, Alfred Gough, Alvin Sargent, Michael Chabon",
+                "pla": "Oyuncular:Tobey Maguire, Kirsten Dunst, James Franco, Alfred Molina",
+                "teaser": "https://www.izlesene.com/embedplayer/136244",
+                "img": "https://i.imgur.com/O3Rz1Di.jpeg"
+        },
+        {
+                "name": "Kır Zincirlerini (Unleashed)",
+                "year": "Yapım:2005 - ABD, Fransa, İngiltere",
+                "sty": "Tür:Aksiyon, Suç",
+                "times": "Süre:103 dakika",
+                "dir": "Yönetmen:Louis Leterrier",
+                "sce": "Senaryo:Luc Besson",
+                "pla": "Oyuncular:Morgan Freeman, Jet Li, Vincent Regan, Bob Hoskins, Kerry Condon",
+                "teaser": "https://www.izlesene.com/embedplayer/6871380",
+                "img": "https://i.imgur.com/MbvbyCX.jpeg"
+        },
+        {
+                "name": "Kurtlar Vadisi: Irak (Wolves Valley: Iraq)",
+                "year": "Yapım:2006 - Türkiye",
+                "sty": "Tür:Aksiyon, Macera",
+                "times": "Süre:122 dakika",
+                "dir": "Yönetmen:Serdar Akar",
+                "sce": "Senaryo:Raci Şaşmaz, Bahadır Özdener",
+                "pla": "Oyuncular:Necati Şaşmaz, Gürkan Uygun, Billy Zane, Bergüzar Gökçe Korel, Kenan Çoban",
+                "teaser": "http://www.izlesene.com/embedplayer/168704",
+                "img": "https://i.imgur.com/Sglajl3.jpeg"
+        },
+        {
+                "name": "Hızlı ve Öfkeli: Tokyo Yarışı (The Fast and the Furious: Tokyo Drift)",
+                "year": "Yapım:2006",
+                "sty": "Tür:Aksiyon, Gerilim, Suç",
+                "times": "Süre:104 dakika",
+                "dir": "Yönetmen:Justin Lin",
+                "sce": "Senaryo:Chris Morgan",
+                "pla": "Oyuncular:Lucas Black, Damien Marzette, Trula M. Marcus, Zachery Ty Bryan",
+                "teaser": "https://www.izlesene.com/embedplayer/4241131",
+                "img": "https://i.imgur.com/oanLpHX.jpeg"
+        },
+        {
+                "name": "Gri Kurt (The Grey)",
+                "year": "Yapım:2011 - ABD",
+                "sty": "Tür:Macera",
+                "times": "Süre:117 dakika",
+                "dir": "Yönetmen:Joe Carnahan",
+                "sce": "Senaryo:Joe Carnahan, ıan Mackenzie Jeffers",
+                "pla": "Oyuncular:Liam Neeson, Dermot Mulroney, Joe Anderson, Frank Grillo, James Badge Dale",
+                "teaser": "http://www.izlesene.com/embedplayer/5900491",
+                "img": "https://i.imgur.com/7Qvuzsh.jpeg"
+        },
+        {
+                "name": "Kader (Predestination)",
+                "year": "Yapım:2014",
+                "sty": "Tür:Bilim Kurgu, Gizem",
+                "times": "Süre:97 dakika",
+                "dir": "Yönetmen:Michael Spierig, Peter Spierig",
+                "sce": "Senaryo:Michael Spierig, Peter Spierig, Robert A. Heinlein (story)",
+                "pla": "Oyuncular:Ethan Hawke, Sarah Snook, Christopher Kirby, Christopher Sommers",
+                "teaser": "https://www.izlesene.com/embedplayer/7644502",
+                "img": "https://i.imgur.com/cernGME.jpeg"
+        },
+        {
+                "name": "Ölüm Yarisi 3: Cehennem (Death Race: Inferno)",
+                "year": "Yapım:2012 - ABD",
+                "sty": "Tür:Bilim Kurgu, Aksiyon, Gerilim",
+                "times": "Süre:105 dakika",
+                "dir": "Yönetmen:Roel Reiné",
+                "sce": "Senaryo:Tony Giglio",
+                "pla": "Oyuncular:Luke Goss, Tanit Phoenix, Robin Shou, Jeremy Crutchley, Ving Rhames",
+                "teaser": "http://www.izlesene.com/embedplayer/6935798",
+                "img": "https://i.imgur.com/MOVwv1U.jpeg"
+        },
+        {
+                "name": "Arınma Gecesi (The Purge)",
+                "year": "Yapım:2013 - ABD",
+                "sty": "Tür:Gerilim, Korku",
+                "times": "Süre:85 dakika",
+                "dir": "Yönetmen:James DeMonaco",
+                "sce": "Senaryo:James DeMonaco",
+                "pla": "Oyuncular:Frank Grillo, Kiele Sanchez, Zach Gilford, Carlos Gallardo, Carmen Ejogo",
+                "teaser": "http://www.izlesene.com/embedplayer/7584275",
+                "img": "https://i.imgur.com/Zn8aLEA.jpeg"
+        },
+        {
+                "name": "İçerideki Adam (Inside Man)",
+                "year": "Yapım:2006 - ABD",
+                "sty": "Tür:Gerilim",
+                "times": "Süre:129 dakika",
+                "dir": "Yönetmen:Spike Lee",
+                "sce": "Senaryo:Russell Gewirtz",
+                "pla": "Oyuncular:Denzel Washington, Jodie Foster, Clive Owen, Willem Dafoe, Ken Leung",
+                "teaser": "http://www.izlesene.com/embedplayer/3697683",
+                "img": "https://i.imgur.com/kBDWtZZ.jpeg"
+        },
+        {
+                 "name": "A-Takımı (The A-Team)",
+                 "year": "Yapım:2010 - ABD",
+                 "sty": "Tür:Aksiyon, Macera",
+                 "times": "Süre:117 dakika",
+                 "dir": "Yönetmen:Joe Carnahan",
+                 "sce": "Senaryo:Skip Woods, Michael Brandt, Derek Haas, Stephen J. Cannell",
+                 "pla": "Oyuncular:Bradley Cooper, Liam Neeson, Jessica Biel, Patrick Wilson, Sharlto Copley",
+                 "teaser": "http://www.izlesene.com/embedplayer/1491725",
+                 "img": "https://i.imgur.com/vVX0wJf.jpeg"
+        },
+        {
+                 "name": "Er Ryanı Kurtarmak (Saving Private Ryan)",
+                 "year": "Yapım:1998",
+                 "sty": "Tür:Savaş, Drama",
+                 "times": "Süre:169 dakika",
+                 "dir": "Yönetmen:Steven Spielberg",
+                 "sce": "Senaryo:Robert Rodat",
+                 "pla": "Oyuncular:Tom Hanks, Tom Sizemore, Edward Burns, Barry Pepper",
+                 "teaser": "https://www.izlesene.com/embedplayer/6762767",
+                 "img": "https://i.imgur.com/HCSu57S.jpeg"
+        },
+        {
+                  "name": "Ay (Moon)",
+                  "year": "Yapım:2009 - İngiltere",
+                  "sty": "Tür:Bilim Kurgu",
+                  "times": "Süre:97 dakika",
+                  "dir": "Yönetmen:Duncan Jones",
+                  "sce": "Senaryo:Duncan Jones, Nathan Parker",
+                  "pla": "Oyuncular:Kevin Spacey, Sam Rockwell, Kaya Scodelario, Dominique McElligott, Benedict Wong",
+                  "teaser": "http://www.izlesene.com/embedplayer/873632",
+                  "img": "https://i.imgur.com/PHaplkH.jpeg"
+        },
+        {
+                   "name": "Korku Kapanı 5: Kanlı Parti (Wrong Turn 5: Bloodlines)",
+                   "year": "Yapım:2012 - ABD",
+                   "sty": "Tür:Gerilim, Korku",
+                   "times": "Süre:87 dakika",
+                   "dir": "Yönetmen:Declan Obrien",
+                   "sce": "Senaryo:Declan Obrien",
+                   "pla": "Oyuncular:Roxanne McKee, Finn Jones, Doug Bradley, Kyle Redmond-jones, Peter Brooke",
+                   "teaser": "http://www.izlesene.com/embedplayer/6935863",
+                   "img": "https://i.imgur.com/aq0Bjjy.jpeg"
+        },
+        {
+                   "name": "Yenilmez 3 (Undisputed III: Redemption)",
+                   "year": "Yapım:2010 - ABD",
+                   "sty": "Tür:Aksiyon",
+                   "times": "Süre:96 dakika",
+                   "dir": "Yönetmen:Isaac Florentine",
+                   "sce": "Senaryo:David N. White",
+                   "pla": "Oyuncular:Scott Adkins, Mykel Shannon Jenkins, Lateef Crowder, Mark Ivanir, Marko Zaror",
+                   "teaser": "http://www.izlesene.com/embedplayer/1461416",
+                   "img": "https://i.imgur.com/n1WhovE.jpeg"
+        },
+        {
+                    "name": "Siyah Giyen Adamlar 2 (Men in Black II)",
+                    "year": "Yapım:2002 - ABD",
+                    "sty": "Tür:Bilim Kurgu",
+                    "times": "Süre:88 dakika",
+                    "dir": "Yönetmen:Barry Sonnenfeld",
+                    "sce": "Senaryo:Barry Fanaro, Robert Gordon",
+                    "pla": "Oyuncular:Will Smith, Tommy Lee Jones, Rosario Dawson, Tony Shalhoub, Johnny Knoxville",
+                    "teaser": "http://www.izlesene.com/embedplayer/173320",
+                    "img": "https://i.imgur.com/23QP8J1.jpeg"
+        },
+        {
+                    "name": "Thor: Ragnarok ()",
+                    "year": "Yapım:2011 - ABD",
+                    "sty": "Tür:Aksiyon, Fantastik, Macera",
+                    "times": "Süre:115 dakika",
+                    "dir": "Yönetmen:Kenneth Branagh",
+                    "sce": "Senaryo:Zack Stentz, Ashley Miller",
+                    "pla": "Oyuncular:Chris Hemsworth, Natalie Portman, Tom Hiddleston, Anthony Hopkins, Stellan Skarsgård",
+                    "teaser": "https://www.izlesene.com/embedplayer/2895351",
+                    "img": "https://i.imgur.com/put6qmL.jpeg"
+        },
+        {
+                    "name": "İnanılmaz Örümcek Adam 2 (The Amazing Spider-Man 2)",
+                    "year": "Yapım:2014",
+                    "sty": "Tür:Fantastik",
+                    "times": "Süre:142 dakika",
+                    "dir": "Yönetmen:Marc Webb",
+                    "sce": "Senaryo:Stan Lee, Alex Kurtzman, Steve Ditko",
+                    "pla": "Oyuncular:Andrew Garfield, Emma Stone, Jamie Foxx, Dane DeHaan",
+                    "teaser": "https://www.izlesene.com/embedplayer/7248659",
+                    "img": "https://i.imgur.com/elsFJy9.jpeg"
+        },
+        {
+                    "name": "Kıyamet Günü (Doomsday)",
+                    "year": "Yapım:2008 - ABD, İngiltere",
+                    "sty": "Tür:Kıyamet Sonrası",
+                    "times": "Süre:105 dakika",
+                    "dir": "Yönetmen:Neil Marshall",
+                    "sce": "Senaryo:Neil Marshall",
+                    "pla": "Oyuncular:Rhona Mitra, Malcolm McDowell, Bob Hoskins, Alexander Siddig, Adrian Lester",
+                    "teaser": "https://www.izlesene.com/embedplayer/230657",
+                    "img": "https://i.imgur.com/34TtTIW.jpeg"
+        },
+        {
+                    "name": "Banliyö 13 (District B13)",
+                    "year": "Yapım:2004 - Fransa",
+                    "sty": "Tür:Aksiyon, Gerilim",
+                    "times": "Süre:84 dakika",
+                    "dir": "Yönetmen:Pierre Morel",
+                    "sce": "Senaryo:Luc Besson, Bibi Naceri",
+                    "pla": "Oyuncular:David Belle, Cyril Raffaelli, Dany Verissimo, Bibi Naceri, Ludovic Berthillot",
+                    "teaser": "http://www.izlesene.com/embedplayer/3200959",
+                    "img": "https://i.imgur.com/DdP6C94.jpeg"
+        },
+        {
+                    "name": "Robin Hood (Robin Hood)",
+                    "year": "Yapım:2010 - ABD, İngiltere",
+                    "sty": "Tür:Aksiyon, Macera, Tarihi",
+                    "times": "Süre:140 dakika",
+                    "dir": "Yönetmen:Ridley Scott",
+                    "sce": "Senaryo:Brian Helgeland",
+                    "pla": "Oyuncular:Russell Crowe, Cate Blanchett, Matthew Macfadyen, Mark Strong, Luke Evans",
+                    "teaser": "http://www.izlesene.com/embedplayer/1445384",
+                    "img": "https://i.imgur.com/Z17tzGy.jpeg"
+        },
+        {
+                    "name": "Apokalipto (Apocalypto)",
+                    "year": "Yapım:2006 - ABD",
+                    "sty": "Tür:Aksiyon, Macera",
+                    "times": "Süre:139 dakika",
+                    "dir": "Yönetmen:Mel Gibson",
+                    "sce": "Senaryo:Mel Gibson, Farhad Safinia",
+                    "pla": "Oyuncular:Rudy Youngblood, Dalia Hernandez, Amilcar Ramírez, Mayra Serbulo, Espiridion Acosta Cache",
+                    "teaser": "http://www.izlesene.com/embedplayer/128248",
+                    "img": "https://i.imgur.com/TwzQWVh.jpeg"
+        },
+        {
+                    "name": "Evrim (Transcendence)",
+                    "year": "Yapım:2014",
+                    "sty": "Tür:Bilim Kurgu",
+                    "times": "Süre:119 dakika",
+                    "dir": "Yönetmen:Wally Pfister",
+                    "sce": "Senaryo:Jack Paglen",
+                    "pla": "Oyuncular:Johnny Depp, Rebecca Hall, Paul Bettany, Cillian Murphy",
+                    "teaser": "https://www.izlesene.com/embedplayer/7238553",
+                    "img": "https://i.imgur.com/RGFSNz6.jpeg"
+        },
+        {
+                    "name": "Suikast (Mechanic: Resurrection)",
+                    "year": "Yapım:2016 - ABD, Tayland",
+                    "sty": "Tür:Aksiyon, Suç",
+                    "times": "Süre:99 dakika",
+                    "dir": "Yönetmen:Dennis Gansel",
+                    "sce": "Senaryo:Tony Mosher, Lewis John Carlino",
+                    "pla": "Oyuncular:Jason Statham, Jessica Alba, Tommy Lee Jones, Michelle Yeoh, Natalie Burn",
+                    "teaser": "https://www.izlesene.com/embedplayer/9453270",
+                    "img": "https://i.imgur.com/I2mCxUe.jpeg"
+        },
+        {
+                    "name": "Tetikçiler (Looper)",
+                    "year": "Yapım:2012 - ABD",
+                    "sty": "Tür:Bilim Kurgu, Suç",
+                    "times": "Süre:119 dakika",
+                    "dir": "Yönetmen:Rian Johnson",
+                    "sce": "Senaryo:Rian Johnson",
+                    "pla": "Oyuncular:Bruce Willis, Joseph Gordon-Levitt ,  Emily Blunt, Piper Perabo, Jeff Daniels",
+                    "teaser": "http://www.izlesene.com/embedplayer/6878136",
+                    "img": "https://i.imgur.com/KyMRXQb.jpeg"
+        },
+        {
+                    "name": "Ölülerin Şafağı (Dawn Of The Dead)",
+                    "year": "Yapım:2004 - ABD",
+                    "sty": "Tür:Kıyamet Sonrası, Korku",
+                    "times": "Süre:101 dakika",
+                    "dir": "Yönetmen:Zack Snyder",
+                    "sce": "Senaryo:George A. Romero, James Gunn",
+                    "pla": "Oyuncular:Kevin Zegers, Ving Rhames, Sarah Polley, Lindy Booth, Mekhi Phifer",
+                    "teaser": "http://www.izlesene.com/embedplayer/4247723",
+                    "img": "https://i.imgur.com/VP9hh5d.jpeg"
+        },
+        {
+                    "name": "Hız Tutkusu (Need For Speed)",
+                    "year": "Yapım:2014",
+                    "sty": "Tür:Aksiyon, Suç",
+                    "times": "Süre:132 dakika",
+                    "dir": "Yönetmen:Scott Waugh",
+                    "sce": "Senaryo:John Gatins, George Gatins",
+                    "pla": "Oyuncular:Aaron Paul, Dominic Cooper, Imogen Poots, Scott Mescudi",
+                    "teaser": "https://www.izlesene.com/embedplayer/7148118",
+                    "img": "https://i.imgur.com/1ePGEb8.jpeg"
+        },
+        {
+                    "name": "Harry Potter ve Felsefe Taşı (Harry Potter and the Sorcerers Stone)",
+                    "year": "Yapım:2001 - ABD, İngiltere",
+                    "sty": "Tür:Fantastik, Macera",
+                    "times": "Süre:152 dakika",
+                    "dir": "Yönetmen:Chris Columbus",
+                    "sce": "Senaryo:J.K. Rowling,  Steve Kloves",
+                    "pla": "Oyuncular:Emma Watson, Daniel Radcliffe, Rupert Grint, Alan Rickman, Bonnie Wright",
+                    "teaser": "https://www.izlesene.com/embedplayer/6907137",
+                    "img": "https://i.imgur.com/i5OST9V.jpeg"
+                
+        },
+        {
+                    "name": "Yüzüklerin Efendisi: İki Kule (The Lord Of The Rings: Two Tower)",
+                    "year": "Yapım:2002 - ABD",
+                    "sty": "Tür:Fantastik",
+                    "times": "Süre:179 dakika",
+                    "dir": "Yönetmen:Peter Jackson",
+                    "sce": "Senaryo:Peter Jackson, Fran Walsh, Philippa Boyens, Stephen Sinclair",
+                    "pla": "Oyuncular:Orlando Bloom, Elijah Wood, Liv Tyler, Viggo Mortensen, Hugo Weaving",
+                    "teaser": "http://www.izlesene.com/embedplayer/6757616",
+                    "img": "https://i.imgur.com/YhtUKaa.jpeg"
+        },
+        {
+                    "name": "Avatar (Avatar)",
+                    "year": "Yapım:2009 - İngiltere, ABD",
+                    "sty": "Tür:Bilim Kurgu, Fantastik, Kıyamet Sonrası",
+                    "times": "Süre:162 dakika",
+                    "dir": "Yönetmen:James Cameron",
+                    "sce": "Senaryo:James Cameron",
+                    "pla": "Oyuncular:Michelle Rodriguez, Sam Worthington, Zoe Saldana, Sigourney Weaver, Giovanni Ribisi",
+                    "teaser": "http://www.izlesene.com/embedplayer/4261739",
+                    "img": "https://i.imgur.com/Vz51IL5.jpeg"
+        }
+  ]'));
+}
+
+//Butonlar için fonksiyon
+void Gecisler
+{
+  panel = uFragmanliFilm.AddNewProPanel(uFragmanliFilm,'panel');
+  clComponent.SetupComponent(panel,'{"Align" : "alMostBottom","Width" :360, 
+  "Height":50,"RoundHeight":10,"RoundWidth":10,"Backgroundcolor": "#ffffff"}');
+  panel.Align = alMostBottom;
+  
+  btn1 = uFragmanliFilm.AddNewProButton(panel, 'btn1', '');
+  clComponent.SetupComponent(btn1,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/ljHlx6e.png","ImgFit":"yes"
+  }');
+  btn1.Margins.Right = 290;
+  uFragmanliFilm.AddNewEvent(btn1,tbeOnClick,'GotoAnaSayfa');
+  
+  btn2 = uFragmanliFilm.AddNewProButton(panel, 'btn2', '');
+  clComponent.SetupComponent(btn2,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/uhb99IV.png","ImgFit":"yes"
+  }');
+  btn2.Margins.Right = 145;
+  
+  
+  btn3 = uFragmanliFilm.AddNewProButton(panel, 'btn3', '');
+  clComponent.SetupComponent(btn3,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/DokOV7t.png","ImgFit":"yes"
+  }');
+  btn3.Margins.Left = 0;
+  uFragmanliFilm.AddNewEvent(btn3,tbeOnClick,'GotoTiyatro');
+  
+  
+  btn4 = uFragmanliFilm.AddNewProButton(panel, 'btn4', '');
+  clComponent.SetupComponent(btn4,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/kPWYntB.png","ImgFit":"yes"
+  }');
+  btn4.Margins.Left = 145;
+  uFragmanliFilm.AddNewEvent(btn4,tbeOnClick,'GotoRating');
+  
+  
+  btn5 = uFragmanliFilm.AddNewProButton(panel, 'btn5', '');
+  clComponent.SetupComponent(btn5,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/ILHO3MM.png","ImgFit":"yes"
+  }');
+  btn5.Margins.Left = 290;
+  uFragmanliFilm.AddNewEvent(btn5,tbeOnClick,'GotoKanallar');
+  
+}
+
+//Arama yapmak için
+void Arama
+{
+  searchEdt = uFragmanliFilm.AddNewProSearchEdit(uFragmanliFilm,'searchEdt','Film arayın...');
+  searchEdt.Align = alTop;
+  searchEdt.Margins.Top = 15;
+  searchEdt.Margins.Left = 5;
+  searchEdt.Margins.Right = 5;
+  searchEdt.Margins.Bottom = 10;
+  searchEdt.Height = 40;
+}
+
+{
+  uFragmanliFilm = TclForm.Create(Self);
+  uFragmanliFilm.SetFormBGImage('https://i.imgur.com/Wu9O9uO.png');
+  uFragman = TclUnit.Create; 
+  uAnaSayfa = TclUnit.Create; 
+  uKanallar = TclUnit.Create;
+  uRating = TclUnit.Create;
+  uTiyatro = TclUnit.Create;
+
+  Arama;
+  
+  CreateListView;
+  CreateDesignerPanel;
+  CreateData;
+  veriAl;
+  
+  Gecisler;
+  uFragmanliFilm.Run;
+}
+        
+        
+        

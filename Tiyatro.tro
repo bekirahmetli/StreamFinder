@@ -1,0 +1,377 @@
+var
+ uTiyatro:TCLForm;
+ clRest:TclRest;
+ qry:TCLJSONQuery;
+ qryString:String;
+ DesignerPanel : TClListViewDesignerPanel;
+ listView:TClProListView;
+ title,sahne,url:TClProLabel;
+ image:TClProImage;
+ gonder : String;
+ searchEdt : TClProSearchEdit;
+ uTiyatroWeb : TclUnit;
+ uFragmanliFilm,uAnaSayfa,uKanallar,uRating : TclUnit;
+ btn1,btn2,btn3,btn4,btn5 : TClProButton;
+ panel: TclProPanel;
+ 
+ //İlgili tiyatronun web sayfasına gitmek için
+ void GotoWeb
+  {
+     
+    gonder = listView.clSelectedItemData(clText3); 
+    
+    Clomosy.GlobalVariableString = gonder; 
+        
+    uTiyatro.clShow;
+    uTiyatroWeb.UnitName = 'TiyatroWeb';
+    uTiyatroWeb.CallerForm = uTiyatro;
+    uTiyatroWeb.Run;
+     
+  }
+    
+ 
+   //Json Verileri
+ void jsonYukleNo ; 
+ {   
+   qry = TCLJSONQuery.Create(nil);
+ qry = Clomosy.ClDataSetFromJSON('[
+           {
+            "image": "https://tiyatrolar.com.tr/files/activity/a/ali-congun-stand-up/image/ali-congun-stand-up-250x359.jpg",
+            "title": "Ali Congun - Stand Up",
+            "sahne": "Baba Sahne",
+            "url": "https://tiyatrolar.com.tr/tiyatro/ali-congun-stand-up"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/d/dogu-demirkol-stand-up/image/dogu-demirkol-stand-up-250x359.jpg",
+            "title": "Doğu Demirkol Stand-Up",
+            "sahne": "Maximum UNIQ",
+            "url": "https://tiyatrolar.com.tr/tiyatro/dogu-demirkol-stand-up"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/i/insanciklar/image/insanciklar-250x359.jpg",
+            "title": "İnsancıklar",
+            "sahne": "Fuat Paşa Yalısı",
+            "url": "https://tiyatrolar.com.tr/tiyatro/insanciklar"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/f/fosforlu-cevriye-1/image/fosforlu-cevriye-1-250x359.jpg",
+            "title": "Fosforlu Cevriye",
+            "sahne": "Harbiye Cemil Topuzlu Açıkhava Tiyatrosu",
+            "url": "https://tiyatrolar.com.tr/tiyatro/fosforlu-cevriye-1"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/a/armagan-caglayan-ile-size-anlatacaklarim-var/image/armagan-caglayan-ile-size-anlatacaklarim-var-250x359.jpg",
+            "title": "Armağan Çağlayan İle Size Anlatacaklarım Var",
+            "sahne": "Selamiçeşme Özgürlük Parkı Amfi Tiyatro",
+            "url": "https://tiyatrolar.com.tr/tiyatro/armagan-caglayan-ile-size-anlatacaklarim-var"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/a/alevli-gunler/image/alevli-gunler-250x359.jpg",
+            "title": "Alevli Günler",
+            "sahne": "Selamiçeşme Özgürlük Parkı Amfi Tiyatro",
+            "url": "https://tiyatrolar.com.tr/tiyatro/alevli-gunler"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/s/saksakcilar/image/saksakcilar-250x359.jpg",
+            "title": "Şakşakçılar",
+            "sahne": "Selamiçeşme Özgürlük Parkı Amfi Tiyatro",
+            "url": "https://tiyatrolar.com.tr/tiyatro/saksakcilar"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/e/eksik-1/image/eksik-1-250x359.jpg",
+            "title": "Eksik",
+            "sahne": "KüçükÇiftlik Park",
+            "url": "https://tiyatrolar.com.tr/tiyatro/eksik-1"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/u/ufuk-cizgisi/image/ufuk-cizgisi-250x359.jpg",
+            "title": "Ufuk Çizgisi",
+            "sahne": "Torium Sahne",
+            "url": "https://tiyatrolar.com.tr/tiyatro/ufuk-cizgisi"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/i/iki-efendinin-usagi-2/image/iki-efendinin-usagi-2-250x359.jpg",
+            "title": "İki Efendinin Uşağı",
+            "sahne": "Harbiye Cemil Topuzlu Açıkhava Tiyatrosu",
+            "url": "https://tiyatrolar.com.tr/tiyatro/iki-efendinin-usagi-2"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/l/leydi-brightin-deliligi/image/leydi-brightin-deliligi-250x359.jpg",
+            "title": "Leydi Brightın Deliliği",
+            "sahne": "Werkstatt Akademi",
+            "url": "https://tiyatrolar.com.tr/tiyatro/leydi-brightin-deliligi"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/s/shirley-valentine-1/image/shirley-valentine-1-250x359.jpg",
+            "title": "Shirley Valentine",
+            "sahne": "Selamiçeşme Özgürlük Parkı Amfi Tiyatro",
+            "url": "https://tiyatrolar.com.tr/tiyatro/shirley-valentine-1"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/m/mahser-i-cumbus/image/mahser-i-cumbus-250x359.jpg",
+            "title": "Mahşer-i Cümbüş",
+            "sahne": "Trump Kültür ve Gösteri Merkezi",
+            "url": "https://tiyatrolar.com.tr/tiyatro/mahser-i-cumbus"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/r/rustem-oglu-cemalin-tuhaf-hikayesi/image/rustem-oglu-cemalin-tuhaf-hikayesi-250x359.jpg",
+            "title": "Rüstemoğlu Cemalin Tuhaf Hikayesi",
+            "sahne": "Harbiye Cemil Topuzlu Açıkhava Tiyatrosu",
+            "url": "https://tiyatrolar.com.tr/tiyatro/rustem-oglu-cemalin-tuhaf-hikayesi"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/m/mutlu-aile-tablosu/image/mutlu-aile-tablosu-250x359.jpg",
+            "title": "Mutlu Aile Tablosu",
+            "sahne": "Selamiçeşme Özgürlük Parkı Amfi Tiyatro",
+            "url": "https://tiyatrolar.com.tr/tiyatro/mutlu-aile-tablosu"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/m/mini-mini-bir-kus-muzikali/image/mini-mini-bir-kus-muzikali-250x359.jpg",
+            "title": "Mini Mini Bir Kuş Müzikali",
+            "sahne": "Hilltown Seyirlik Sahne",
+            "url": "https://tiyatrolar.com.tr/tiyatro/mini-mini-bir-kus-muzikali"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/n/nilgun-belgun-le-ask-ve-komedi/image/nilgun-belgun-le-ask-ve-komedi-250x359.jpg",
+            "title": "Nilgün Belgünle Aşk ve Komedi",
+            "sahne": "Selamiçeşme Özgürlük Parkı Amfi Tiyatro",
+            "url": "https://tiyatrolar.com.tr/tiyatro/nilgun-belgun-le-ask-ve-komedi"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/k/karanlikta-komedi-5/image/karanlikta-komedi-5-250x359.jpg",
+            "title": "Karanlıkta Komedi",
+            "sahne": "Selamiçeşme Özgürlük Parkı Amfi Tiyatro",
+            "url": "https://tiyatrolar.com.tr/tiyatro/karanlikta-komedi-5"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/o/oksimoron-erkek-akli/image/oksimoron-erkek-akli-250x359.jpg",
+            "title": "Erkek Aklı “Oksimoron”",
+            "sahne": "Selamiçeşme Özgürlük Parkı Amfi Tiyatro",
+            "url": "https://tiyatrolar.com.tr/tiyatro/oksimoron-erkek-akli"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/b/beyaz-geceler-1/image/beyaz-geceler-1-250x359.jpg",
+            "title": "Beyaz Geceler",
+            "sahne": "Fuat Paşa Yalısı",
+            "url": "https://tiyatrolar.com.tr/tiyatro/beyaz-geceler-1"
+        },
+        {
+            "image": "https://tiyatrolar.com.tr/files/activity/k/korkuyu-beklerken-1/image/korkuyu-beklerken-1-250x359.jpg",
+            "title": "Korkuyu Beklerken",
+            "sahne": "Hilltown Seyirlik Sahne",
+            "url": "https://tiyatrolar.com.tr/tiyatro/korkuyu-beklerken-1"
+        }
+ ]');
+ }
+ 
+//arama yapmak için edit
+ void SetSearchEdit;
+ {
+   searchEdt = uTiyatro.AddNewProSearchEdit(uTiyatro,'searchEdt','Tiyatro arayın ...');
+   searchEdt.Align = alTop;
+   searchEdt.Margins.Top = 15;
+   searchEdt.Margins.Left = 5;
+   searchEdt.Margins.Right = 5;
+   searchEdt.Margins.Bottom = 10;
+   searchEdt.Height = 40;
+ }
+//listview oluşturma
+ void CreateListView
+{
+  listView = uTiyatro.AddNewProListView(uTiyatro,'listView');
+  listView.clProSettings.ItemSpace = 10;     
+  listView.clProSettings.IsFill = True;
+  listView.Height = uTiyatro.clheight*80/100;
+
+  listView.clProSettings.IsRound = True;
+
+  listView.Align=alBottom;
+  listView.clProSettings.RoundHeight = 5;
+  listView.clProSettings.RoundWidth = 5;
+  listView.clProSettings.BorderColor =clAlphaColor.clHexToColor('#f3aa44');
+  listView.clProSettings.BorderWidth = 2;
+  listView.clProSettings.ItemHeight = 115;
+  listView.clProSettings.ColCount = 1;
+  listView.SetclProSettings(listView.clProSettings);
+  searchEdt.TargetListView = listView;
+  uTiyatro.AddNewEvent(listView,tbeOnItemClick,'GotoWeb');
+}
+
+
+
+void CreateDesignerPanel
+{
+  DesignerPanel = uTiyatro.AddNewProListViewDesignerPanel(listView, 'DesignerPanel');
+  
+  clComponent.SetupComponent(DesignerPanel, 
+  '{"Height":75,
+    "BackgroundColor":"#B3FCE5",
+    "RoundHeight":20,
+    "RoundWidth":20}');
+    listView.SetDesignerPanel(DesignerPanel);
+    
+    
+}
+//verileri listviewe yerleştirme
+void CreateData;
+{ 
+ 
+  
+  title = uTiyatro.AddNewProLabel(DesignerPanel, 'title', '');
+  title.clProSettings.FontVertAlign = palLeading;
+  title.Align=alTop;
+  title.Margins.Top=5;
+  title.Margins.Left=5;
+  title.clProSettings.AutoSize=True;
+  title.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  title.SetclProSettings(title.clProSettings);
+  DesignerPanel.AddPanelObject(title, clText2);
+  
+  
+  sahne = uTiyatro.AddNewProLabel(DesignerPanel, 'sahne', '');
+  sahne.clProSettings.FontVertAlign = palLeading;
+  sahne.Align=alTop;
+  sahne.Margins.Top=5;
+  sahne.Margins.Left=5;
+  sahne.clProSettings.AutoSize=True;
+  sahne.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  sahne.SetclProSettings(sahne.clProSettings);
+  DesignerPanel.AddPanelObject(sahne, clCaption);
+  
+  url = uTiyatro.AddNewProLabel(DesignerPanel, 'url', '');
+  url.clProSettings.FontVertAlign = palLeading;
+  url.Margins.Bottom=65;
+  url.Margins.Left=235;
+  url.clProSettings.AutoSize=True;
+  url.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  url.SetclProSettings(url.clProSettings);
+  DesignerPanel.AddPanelObject(url, clText3); 
+  url.visible = false; 
+   
+  
+  image = uTiyatro.AddNewProImage(DesignerPanel, 'image');
+  image.Align=alRight;
+  image.Margins.Left=15;
+  image.Height = 90;
+  image.Width = 80;
+  image.clProSettings.AutoSize=True;
+  image.SetclProSettings(image.clProSettings);
+  DesignerPanel.AddPanelObject(image, clImage1);
+  
+
+}
+//listviewe json verilerini yukleme 
+ void listViewVeriEkle;
+ {
+  listView.clLoadProListViewDataFromDataset(Clomosy.ClDataSetFromJSON(qry.GetJSONString));
+ }
+ 
+ 
+ //Anasayfaya giden fonksiyon
+ void GotoAnaSayfa
+ {
+    uTiyatro.clShow;
+    uAnaSayfa.UnitName = 'AnaSayfa';
+    uAnaSayfa.CallerForm = uTiyatro;
+    uAnaSayfa.Run;
+ }
+
+
+ //Fragmanlı Film sayfasına gitmek için
+ void GotoFragmanliFilm
+ {
+    uTiyatro.clShow;
+    uFragmanliFilm.UnitName = 'FragmanliFilm';
+    uFragmanliFilm.CallerForm = uTiyatro;
+    uFragmanliFilm.Run;
+ }
+
+ //Kanallar sayfasına gitmek için
+ void GotoKanallar
+ {
+    uTiyatro.clShow;
+    uKanallar.UnitName = 'Kanallar';
+    uKanallar.CallerForm = uTiyatro;
+    uKanallar.Run;
+ }
+
+ //Rating sayfasına gitmek için
+ void GotoRating
+ {
+    uTiyatro.clShow;
+    uRating.UnitName = 'Rating';
+    uRating.CallerForm = uTiyatro;
+    uRating.Run;
+ }
+  
+//Butonlar için fonksiyon
+void Gecisler
+{
+  panel = uTiyatro.AddNewProPanel(uTiyatro,'panel');
+  clComponent.SetupComponent(panel,'{"Align" : "alMostBottom","Width" :360, 
+  "Height":50,"RoundHeight":10,"RoundWidth":10,"Backgroundcolor": "#ffffff"}');
+  panel.Align = alMostBottom;
+  
+  btn1 = uTiyatro.AddNewProButton(panel, 'btn1', '');
+  clComponent.SetupComponent(btn1,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/ljHlx6e.png","ImgFit":"yes"
+  }');
+  btn1.Margins.Right = 290;
+  uTiyatro.AddNewEvent(btn1,tbeOnClick,'GotoAnaSayfa');
+  
+  btn2 = uTiyatro.AddNewProButton(panel, 'btn2', '');
+  clComponent.SetupComponent(btn2,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/uhb99IV.png","ImgFit":"yes"
+  }');
+  btn2.Margins.Right = 145;
+  uTiyatro.AddNewEvent(btn2,tbeOnClick,'GotoFragmanliFilm');
+  
+  
+  btn3 = uTiyatro.AddNewProButton(panel, 'btn3', '');
+  clComponent.SetupComponent(btn3,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/DokOV7t.png","ImgFit":"yes"
+  }');
+  btn3.Margins.Left = 0;
+  
+  
+  btn4 = uTiyatro.AddNewProButton(panel, 'btn4', '');
+  clComponent.SetupComponent(btn4,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/kPWYntB.png","ImgFit":"yes"
+  }');
+  btn4.Margins.Left = 145;
+  uTiyatro.AddNewEvent(btn4,tbeOnClick,'GotoRating');
+  
+  btn5 = uTiyatro.AddNewProButton(panel, 'btn5', '');
+  clComponent.SetupComponent(btn5,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/ILHO3MM.png","ImgFit":"yes"
+  }');
+  btn5.Margins.Left = 290;
+  uTiyatro.AddNewEvent(btn5,tbeOnClick,'GotoKanallar');
+  
+}
+ 
+ 
+
+{
+ uTiyatro = TCLForm.Create(Self);
+ uTiyatro.SetFormBGImage('https://i.imgur.com/Wu9O9uO.png');
+ uTiyatroWeb = TclUnit.Create;
+ uAnaSayfa = TclUnit.Create; 
+ uFragmanliFilm = TclUnit.Create;
+ uKanallar = TclUnit.Create;
+ uRating = TclUnit.Create;
+ 
+ 
+ jsonYukleNo;
+ SetSearchEdit;
+ CreateListView;
+ CreateDesignerPanel;
+ CreateData;
+ listViewVeriEkle;
+  
+ Gecisler;
+   
+ uTiyatro.Run;
+ 
+
+} 

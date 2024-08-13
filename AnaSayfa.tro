@@ -1,0 +1,2311 @@
+Var   
+  uAnaSayfa:TclForm;
+  ListView : TClProListView;
+  DesignerPanel : TClListViewDesignerPanel;
+  Title,Year,imdbID,Type1 : TclProLabel;
+  Poster : TclProImage;
+  searchEdt : TClProSearchEdit;
+  gonder : String;//Film idlerini göndermek için
+  uDetay,uFragmanliFilm,uKanallar,uRating,uTiyatro : TclUnit;
+  btn1,btn2,btn3,btn4,btn5 : TClProButton;
+  panel: TclProPanel;
+
+//Filmlerin detay sayfasına gitmek için
+void GotoDetay
+{
+    //film idlerini göndermek için
+    gonder = ListView.clSelectedItemData(clText5); 
+    
+    Clomosy.GlobalVariableString = gonder; 
+    
+    uAnaSayfa.clShow;
+    uDetay.UnitName = 'Detay';
+    uDetay.CallerForm = uAnaSayfa;
+    uDetay.Run;
+}
+
+//Fragman Film sayfasına gitmek için
+void GotoFragmanliFilm
+{
+    uAnaSayfa.clShow;
+    uFragmanliFilm.UnitName = 'FragmanliFilm';
+    uFragmanliFilm.CallerForm = uAnaSayfa;
+    uFragmanliFilm.Run;
+}
+
+//Kanal sayfasına gitmek için
+void GotoKanallar
+{
+    uAnaSayfa.clShow;
+    uKanallar.UnitName = 'Kanallar';
+    uKanallar.CallerForm = uAnaSayfa;
+    uKanallar.Run;
+}
+
+//Rating sayfasına gitmek için
+void GotoRating
+{
+    uAnaSayfa.clShow;
+    uRating.UnitName = 'Rating';
+    uRating.CallerForm = uAnaSayfa;
+    uRating.Run;
+}
+
+//Tiyatro sayfasına gitmek için
+void GotoTiyatro
+{
+    uAnaSayfa.clShow;
+    uTiyatro.UnitName = 'Tiyatro';
+    uTiyatro.CallerForm = uAnaSayfa;
+    uTiyatro.Run;
+}
+
+
+//listview oluşturma
+void CreateListView
+{
+  ListView = uAnaSayfa.AddNewProListView(uAnaSayfa,'ListView');
+  ListView.Align = AlClient;
+  ListView.Height = 170;
+  ListView.Margins.Bottom = 5;
+  ListView.Margins.Top = 5;
+  ListView.Margins.Right = 5;
+  ListView.Margins.Left = 5;
+  ListView.clProSettings.ViewType = lvIcon;
+  ListView.clProSettings.ColCount = 1;
+  ListView.clProSettings.ItemHeight = 100;
+  ListView.clProSettings.ItemSpace = 10;
+  ListView.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#FFFCFF');
+  ListView.clProSettings.BorderColor = clAlphaColor.clHexToColor('#66FF7F');
+  ListView.clProSettings.BorderWidth = 2;
+  ListView.clProSettings.RoundHeight = 5;
+  ListView.clProSettings.RoundWidth = 5;
+  ListView.SetclProSettings(ListView.clProSettings);
+  
+  searchEdt.TargetListView = ListView;
+}
+
+void CreateDesignerPanel
+{
+  DesignerPanel = uAnaSayfa.AddNewProListViewDesignerPanel(ListView, 'DesignerPanel');
+  DesignerPanel.Height = 100;
+  DesignerPanel.Width = 150;
+  DesignerPanel.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#B3FCE5');
+  DesignerPanel.clProSettings.BorderColor = clAlphaColor.clHexToColor('#16FF8C');
+  DesignerPanel.clProSettings.BorderWidth = 2;
+  DesignerPanel.clProSettings.RoundHeight = 20;
+  DesignerPanel.clProSettings.RoundWidth = 20;
+  DesignerPanel.SetclProSettings(DesignerPanel.clProSettings);
+  
+  ListView.SetDesignerPanel(DesignerPanel);
+}
+
+//Jsondaki verileri ListViewede nereye koyulacağını işaret eden fonksiyon
+void CreateData;
+{  
+  Poster = uAnaSayfa.AddNewProImage(DesignerPanel, 'Poster');
+  Poster.Align = AlLeft;
+  Poster.Margins.Top = 10;
+  Poster.Margins.Bottom = 10;
+  DesignerPanel.AddPanelObject(Poster, clImage1);
+
+  Title = uAnaSayfa.AddNewProLabel(DesignerPanel, 'Title', '');
+  Title.Align = AlVertCenter;
+  Title.clProSettings.AutoSize=True;
+  Title.Height =30;
+  Title.Margins.Bottom = 10;
+  Title.Margins.Top = 10;
+  Title.Margins.Right = 10;
+  Title.Margins.Left = 10;
+  Title.clProSettings.FontColor = clAlphaColor.clHexToColor('#000000');
+  Title.clProSettings.FontSize = 9;
+  Title.clProSettings.AutoSize=True;
+  Title.SetclProSettings(Title.clProSettings);
+  DesignerPanel.AddPanelObject(Title, clText);
+    
+  Year = uAnaSayfa.AddNewProLabel(DesignerPanel, 'Year', '');
+  Year.Align = AlVertCenter;
+  Year.Margins.Top = 55;
+  Year.Margins.Right = 10;
+  Year.Margins.Left = 10;
+  Year.clProSettings.FontColor = clAlphaColor.clHexToColor('#000000');
+  Year.clProSettings.FontSize = 15;
+  Year.clProSettings.AutoSize=True;
+  Year.SetclProSettings(Year.clProSettings);
+  DesignerPanel.AddPanelObject(Year, clText2);
+  
+  imdbID = uAnaSayfa.AddNewProLabel(DesignerPanel, 'imdbID', '');
+  DesignerPanel.AddPanelObject(imdbID, clText5); 
+  imdbID.Visible = false;
+  
+  
+  Type1 = uAnaSayfa.AddNewProLabel(DesignerPanel, 'Type', '');
+  Type1.Align = AlVertCenter;
+  Type1.Margins.Top = 20;
+  Type1.Margins.Right = 10;
+  Type1.Margins.Left = 10;
+  Type1.clProSettings.FontColor = clAlphaColor.clHexToColor('#000000');
+  Type1.clProSettings.FontSize = 15;
+  DesignerPanel.AddPanelObject(Type1, clText3);  
+   
+  uAnaSayfa.AddNewEvent(ListView,tbeOnItemClick,'GotoDetay');
+}
+
+//Film verileri
+void veriAl;
+{
+  ListView.clLoadProListViewDataFromDataset(Clomosy.ClDataSetFromJSON('[
+        {
+            "Title": "Inception",
+            "Year": "2010",
+            "imdbID": "tt1375666",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Inception: The Cobol Job",
+            "Year": "2010",
+            "imdbID": "tt5295894",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjE0NGIwM2EtZjQxZi00ZTE5LWExN2MtNDBlMjY1ZmZkYjU3XkEyXkFqcGdeQXVyNjMwNzk3Mjk@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Inception: Jump Right Into the Action",
+            "Year": "2010",
+            "imdbID": "tt5295990",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZGFjOTRiYjgtYjEzMS00ZjQ2LTkzY2YtOGQ0NDI2NTVjOGFmXkEyXkFqcGdeQXVyNDQ5MDYzMTk@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Crack: Inception",
+            "Year": "2019",
+            "imdbID": "tt6793710",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZTU1M2U4OWUtZTQ5OS00OWM1LTljN2EtMWJmZDgxNzUwZGNkXkEyXkFqcGdeQXVyMTA0MjU0Ng@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "WWA: The Inception",
+            "Year": "2001",
+            "imdbID": "tt0311992",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNTEyNGJjMTMtZjZhZC00ODFkLWIyYzktN2JjMTcwMmY5MDJlXkEyXkFqcGdeQXVyNDkwMzY5NjQ@._V1_SX300.jpg"
+        },
+        {
+             "Title": "The Matrix",
+            "Year": "1999",
+            "imdbID": "tt0133093",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Matrix Reloaded",
+            "Year": "2003",
+            "imdbID": "tt0234215",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BODE0MzZhZTgtYzkwYi00YmI5LThlZWYtOWRmNWE5ODk0NzMxXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Matrix Revolutions",
+            "Year": "2003",
+            "imdbID": "tt0242653",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzNlZTZjMDctZjYwNi00NzljLWIwN2QtZWZmYmJiYzQ0MTk2XkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Matrix Resurrections",
+            "Year": "2021",
+            "imdbID": "tt10838180",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMGJkNDJlZWUtOGM1Ny00YjNkLThiM2QtY2ZjMzQxMTIxNWNmXkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Making The Matrix",
+            "Year": "1999",
+            "imdbID": "tt0365467",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZjJjMTg5MTEtMDkwMy00ZjUyLTg5ODYtMmNmY2ZiNGVlZTdjXkEyXkFqcGdeQXVyODA1NjQ0OTY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Matrix Revisited",
+            "Year": "2001",
+            "imdbID": "tt0295432",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTkzNjg3NjE4N15BMl5BanBnXkFtZTgwNTc3NTAwNzE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Enter the Matrix",
+            "Year": "2003",
+            "imdbID": "tt0277828",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNWM3MDU2MWQtYjdlNC00NDBlLTkyNGMtNjdhYjdlNTdiNTFlXkEyXkFqcGdeQXVyNTEwNDY2MjU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "A Glitch in the Matrix",
+            "Year": "2021",
+            "imdbID": "tt9847360",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMWRhNGY3NGQtMDAxMS00YjY2LTgzOTUtZjljZmUyYWQwMGI2XkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Matrix: Path of Neo",
+            "Year": "2005",
+            "imdbID": "tt0451118",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZGFiNGU4MjEtODM2ZC00OTg0LThkNmEtZTBlN2FkMmFjOWYzXkEyXkFqcGdeQXVyNTEwNDY2MjU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Armitage III: Dual Matrix",
+            "Year": "2002",
+            "imdbID": "tt0303678",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOTUwOTY3Mjg1MF5BMl5BanBnXkFtZTcwODI2MTAyMQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Lord of the Rings: The Fellowship of the Ring",
+            "Year": "2001",
+            "imdbID": "tt0120737",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Lord of the Rings: The Return of the King",
+            "Year": "2003",
+            "imdbID": "tt0167260",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzA5ZDNlZWMtM2NhNS00NDJjLTk4NDItYTRmY2EwMWZlMTY3XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Lord of the Rings: The Two Towers",
+            "Year": "2002",
+            "imdbID": "tt0167261",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZGMxZTdjZmYtMmE2Ni00ZTdkLWI5NTgtNjlmMjBiNzU2MmI5XkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Lord of the Rings: The Rings of Power",
+            "Year": "2022–",
+            "imdbID": "tt7631058",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYTZmMzJhOTktNGJjOC00NDE0LThjNTItODQ0YjBjNzg2OWQ4XkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Lord of War",
+            "Year": "2005",
+            "imdbID": "tt0399295",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTYzZWE3MDAtZjZkMi00MzhlLTlhZDUtNmI2Zjg3OWVlZWI0XkEyXkFqcGdeQXVyNDk3NzU2MTQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Lord of the Rings",
+            "Year": "1978",
+            "imdbID": "tt0077869",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOGExMjIxNTMtY2M2NS00YTg0LTgyMDMtZWMyNDZmODZjZTVkXkEyXkFqcGdeQXVyNjc5NjEzNA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Lord of the Flies",
+            "Year": "1990",
+            "imdbID": "tt0100054",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMDczN2I3NzItNjdlMS00YmNhLTkyODQtZGI1YWQ0NmViMTgwXkEyXkFqcGdeQXVyNjMwMjk0MTQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Greystoke: The Legend of Tarzan, Lord of the Apes",
+            "Year": "1984",
+            "imdbID": "tt0087365",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BM2NmYjZjOGItYTQ0ZC00YjcyLTk3MWUtYzdmZjY1MGNkMDViXkEyXkFqcGdeQXVyNzc5MjA3OA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Lord of the Flies",
+            "Year": "1963",
+            "imdbID": "tt0057261",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOGEwYTlhMTgtODBlNC00ZjgzLTk1ZmEtNmNkMTEwYTZiM2Y0XkEyXkFqcGdeQXVyMzU4Nzk4MDI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Lord of Illusions",
+            "Year": "1995",
+            "imdbID": "tt0113690",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNDg1OTc0MDQwNl5BMl5BanBnXkFtZTcwMjQ3NDk0NA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Pirates of the Caribbean: The Curse of the Black Pearl",
+            "Year": "2003",
+            "imdbID": "tt0325980",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNGYyZGM5MGMtYTY2Ni00M2Y1LWIzNjQtYWUzM2VlNGVhMDNhXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Black Panther",
+            "Year": "2018",
+            "imdbID": "tt1825683",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTg1MTY2MjYzNV5BMl5BanBnXkFtZTgwMTc4NTMwNDI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Black Swan",
+            "Year": "2010",
+            "imdbID": "tt0947798",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzY2NzI4OTE5MF5BMl5BanBnXkFtZTcwMjMyNDY4Mw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Black Mirror",
+            "Year": "2011–",
+            "imdbID": "tt2085059",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZTgyNTBkNzctN2I3NC00NTA1LWJiMDMtYzA2MmYyZjc1NWQzXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_SX300.jpg"
+        },
+        {
+            "Title": "Men in Black",
+            "Year": "1997",
+            "imdbID": "tt0119654",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOTlhYTVkMDktYzIyNC00NzlkLTlmN2ItOGEyMWQ4OTA2NDdmXkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Black Widow",
+            "Year": "2021",
+            "imdbID": "tt3480822",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNjRmNDI5MjMtMmFhZi00YzcwLWI4ZGItMGI2MjI0N2Q3YmIwXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Black Hawk Down",
+            "Year": "2001",
+            "imdbID": "tt0265086",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYWMwMzQxZjQtODM1YS00YmFiLTk1YjQtNzNiYWY1MDE4NTdiXkEyXkFqcGdeQXVyNDYyMDk5MTU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Men in Black II",
+            "Year": "2002",
+            "imdbID": "tt0120912",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTMxNDA0NTMxMV5BMl5BanBnXkFtZTYwMDE2NzY2._V1_SX300.jpg"
+        },
+        {
+            "Title": "Men in Black³",
+            "Year": "2012",
+            "imdbID": "tt1409024",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTU2NTYxODcwMF5BMl5BanBnXkFtZTcwNDk1NDY0Nw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Orange Is the New Black",
+            "Year": "2013–2019",
+            "imdbID": "tt2372162",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYjYyM2FmMmMtZDgyZi00NGU3LWI3NzktODllZDY0YzQyNzgyXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Interstellar",
+            "Year": "2014",
+            "imdbID": "tt0816692",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Science of Interstellar",
+            "Year": "2015",
+            "imdbID": "tt4415360",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMDFhNzU4MTMtYzZmNS00ZDEzLTg2MjQtYmUzZDA1ZWU4OTkzXkEyXkFqcGdeQXVyNDQ2MTMzODA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Interstellar Wars",
+            "Year": "2016",
+            "imdbID": "tt5083736",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMzE5MmExYzMtYjQxYi00ZDlkLTkzMTYtMWQzNTZkMjBiYWI2L2ltYWdlXkEyXkFqcGdeQXVyNTM3MDMyMDQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Lolita from Interstellar Space",
+            "Year": "2014",
+            "imdbID": "tt3506492",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNDI1MmJmYWUtOTExZS00MGY3LWJhMzMtNThkYWJhZWQ1YmIyXkEyXkFqcGdeQXVyNjQ2MjQ5NzM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Interstellar: Nolans Odyssey",
+            "Year": "2014",
+            "imdbID": "tt4172224",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNjc4ZjkyZmMtNmRmOS00MDUzLWI4NjgtNWM4ZTI3MzliYmIwXkEyXkFqcGdeQXVyMjc5MDg0NDc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Interstellar Civil War: Shadows of the Empire",
+            "Year": "2017",
+            "imdbID": "tt5056352",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMDJmYjQ4YmEtOTkzMS00MzQ3LWExNmUtMzgzZWQxMWJkZjk2XkEyXkFqcGdeQXVyMzM1MjQzNTk@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Inside Interstellar",
+            "Year": "2015",
+            "imdbID": "tt5297406",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYzNhZjBmNmItZGQ0NS00Mzk4LWJhYTgtZDhkNWJmZTJmZDFmL2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyNjE0OTE2MDY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Transformers: Interstellar",
+            "Year": "2014–2015",
+            "imdbID": "tt6046050",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMGYxMmM0ZWUtMzViMS00YzUxLTllZjEtYzI2YzAzYjlkMWY4XkEyXkFqcGdeQXVyNTY3NjQzNjM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Interstellar",
+            "Year": "2005",
+            "imdbID": "tt0758429",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTgyNzUyMTQ3OV5BMl5BanBnXkFtZTgwNDg0OTE2MzE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Interstellar Ranger Commence",
+            "Year": "2022–",
+            "imdbID": "tt11236038",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjk4MWQyZjQtMmY2ZS00YjdmLTgzMDUtYTc5ZDU5NzQzMmJmXkEyXkFqcGdeQXVyOTgwMDkwNzY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Spider-Man: No Way Home",
+            "Year": "2021",
+            "imdbID": "tt10872600",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZWMyYzFjYTYtNTRjYi00OGExLWE2YzgtOGRmYjAxZTU3NzBiXkEyXkFqcGdeQXVyMzQ0MzA0NTM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Spider-Man",
+            "Year": "2002",
+            "imdbID": "tt0145487",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZDEyN2NhMjgtMjdhNi00MmNlLWE5YTgtZGE4MzNjMTRlMGEwXkEyXkFqcGdeQXVyNDUyOTg3Njg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Spider-Man: Homecoming",
+            "Year": "2017",
+            "imdbID": "tt2250912",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BODY2MTAzOTQ4M15BMl5BanBnXkFtZTgwNzg5MTE0MjI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Spider-Man 2",
+            "Year": "2004",
+            "imdbID": "tt0316654",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMzY2ODk4NmUtOTVmNi00ZTdkLTlmOWYtMmE2OWVhNTU2OTVkXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Amazing Spider-Man",
+            "Year": "2012",
+            "imdbID": "tt0948470",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjMyOTM4MDMxNV5BMl5BanBnXkFtZTcwNjIyNzExOA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Spider-Man: Into the Spider-Verse",
+            "Year": "2018",
+            "imdbID": "tt4633694",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjMwNDkxMTgzOF5BMl5BanBnXkFtZTgwNTkwNTQ3NjM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Spider-Man 3",
+            "Year": "2007",
+            "imdbID": "tt0413300",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYTk3MDljOWQtNGI2My00OTEzLTlhYjQtOTQ4ODM2MzUwY2IwXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Spider-Man: Far from Home",
+            "Year": "2019",
+            "imdbID": "tt6320628",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BODA5MTY0OWUtNjdlOC00NDI5LWE3NjYtNDM4MDI2MzE4OWUxXkEyXkFqcGdeQXVyOTAzODkzMjI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Amazing Spider-Man 2",
+            "Year": "2014",
+            "imdbID": "tt1872181",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOTA5NDYxNTg0OV5BMl5BanBnXkFtZTgwODE5NzU1MTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Spider-Man: Across the Spider-Verse",
+            "Year": "2023",
+            "imdbID": "tt9362722",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMzI0NmVkMjEtYmY4MS00ZDMxLTlkZmEtMzU4MDQxYTMzMjU2XkEyXkFqcGdeQXVyMzQ0MzA0NTM@._V1_SX300.jpg"
+        },
+            {
+            "Title": "Iron Man",
+            "Year": "2008",
+            "imdbID": "tt0371746",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5BanBnXkFtZTcwMTU0NTIzMw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Iron Man 3",
+            "Year": "2013",
+            "imdbID": "tt1300854",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjE5MzcyNjk1M15BMl5BanBnXkFtZTcwMjQ4MjcxOQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Iron Man 2",
+            "Year": "2010",
+            "imdbID": "tt1228705",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZGVkNDAyM2EtYzYxYy00ZWUxLTgwMjgtY2VmODE5OTk3N2M5XkEyXkFqcGdeQXVyNTgzMDMzMTg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Iron Giant",
+            "Year": "1999",
+            "imdbID": "tt0129167",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYzBjZTNkMzQtZmNkOC00Yzk0LTljMjktZjk3YWVlZjY3NTk2XkEyXkFqcGdeQXVyMTUzMDUzNTI3._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Man in the Iron Mask",
+            "Year": "1998",
+            "imdbID": "tt0120744",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZjM2YzcxMmQtOTc2Mi00YjdhLWFlZjUtNmFmMDQzYzU2YTk5L2ltYWdlXkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Iron Fist",
+            "Year": "2017–2018",
+            "imdbID": "tt3322310",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjI5Mjg1NDcyOV5BMl5BanBnXkFtZTgwMjAxOTQ5MTI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Iron Lady",
+            "Year": "2011",
+            "imdbID": "tt1007029",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BODEzNDUyMDE3NF5BMl5BanBnXkFtZTcwMTgzOTg3Ng@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Iron Sky",
+            "Year": "2012",
+            "imdbID": "tt1034314",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTM2MDg5MzgxNF5BMl5BanBnXkFtZTcwODUzNjMxOA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Iron Claw",
+            "Year": "2023",
+            "imdbID": "tt21064584",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOGE5NjllZTEtMGJjNy00ZTFmLThlNDItNmNiZTgyOTQ4OTA2XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Man with the Iron Fists",
+            "Year": "2012",
+            "imdbID": "tt1258972",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTg5ODI3ODkzOV5BMl5BanBnXkFtZTcwMTQxNjUwOA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Better Off Dead",
+            "Year": "1985",
+            "imdbID": "tt0088794",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNTdmMWU3MTktNWY3MC00MTlmLWJiM2QtZWQyM2E3MDI2YzI2XkEyXkFqcGdeQXVyMTUzMDUzNTI3._V1_SX300.jpg"
+        },
+        {
+            "Title": "Better Watch Out",
+            "Year": "2016",
+            "imdbID": "tt4443658",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNmE5NWQyYjktMmMzYi00YjY2LWFmNTUtMWQyMzcwNWM2NWYzXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "In a Better World",
+            "Year": "2010",
+            "imdbID": "tt1340107",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTMxMTc1Mjk0N15BMl5BanBnXkFtZTcwMjUwMzU0NA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Better Off Ted",
+            "Year": "2009–2010",
+            "imdbID": "tt1235547",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTI3NDgzMTU2Nl5BMl5BanBnXkFtZTcwOTUzMzA1Mg@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "A Better Tomorrow",
+            "Year": "1986",
+            "imdbID": "tt0092263",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZTEzMTYwZDItODIyYy00MjRkLTljOWMtZDI0ZmNjN2JjOTEyXkEyXkFqcGdeQXVyNzgzODI1OTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Better Things",
+            "Year": "2016–2022",
+            "imdbID": "tt4370596",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTYwNTMwNDU5M15BMl5BanBnXkFtZTgwMjA3NzU0NzM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "A Better Life",
+            "Year": "2011",
+            "imdbID": "tt1554091",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOWFmYzQ3MWUtNTdmNS00YjE0LTgwNzktOTgzZTY0MDc1NjAwXkEyXkFqcGdeQXVyMTU3NDU4MDg2._V1_SX300.jpg"
+        },
+        {
+            "Title": "Better Living Through Chemistry",
+            "Year": "2014",
+            "imdbID": "tt1609479",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjM3OTA2MjQ4NF5BMl5BanBnXkFtZTgwOTYzNzIwMTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Mo Better Blues",
+            "Year": "1990",
+            "imdbID": "tt0100168",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYmMwY2ZhZjctZTg1Ny00NjNjLThkOTQtZGY2NzA1ODBjMzA3XkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Breaking Bad",
+            "Year": "2008–2013",
+            "imdbID": "tt0903747",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYmQ4YWMxYjUtNjZmYi00MDQ1LWFjMjMtNjA5ZDdiYjdiODU5XkEyXkFqcGdeQXVyMTMzNDExODE5._V1_SX300.jpg"
+        },
+        {
+            "Title": "El Camino: A Breaking Bad Movie",
+            "Year": "2019",
+            "imdbID": "tt9243946",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNjk4MzVlM2UtZGM0ZC00M2M1LThkMWEtZjUyN2U2ZTc0NmM5XkEyXkFqcGdeQXVyOTAzMTc2MjA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Twilight Saga: Breaking Dawn - Part 2",
+            "Year": "2012",
+            "imdbID": "tt1673434",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTcyMzUyMzY1OF5BMl5BanBnXkFtZTcwNDQ4ODk1OA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Twilight Saga: Breaking Dawn - Part 1",
+            "Year": "2011",
+            "imdbID": "tt1324999",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNGE3MGI2YjMtYmQ3OS00OTUwLThhMjgtMjA2NThiYTNhOTM5XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Breaking the Waves",
+            "Year": "1996",
+            "imdbID": "tt0115751",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNDYwZTU2MzktNWYxMS00NTYzLTgzOWEtMTRiYjc5NGY2Nzg1XkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Breaking Away",
+            "Year": "1979",
+            "imdbID": "tt0078902",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNGQ5NDE5ODItNTE1ZS00ZGYyLWI0NmQtZTA2NDYxOTEyYTFmXkEyXkFqcGdeQXVyMTcwOTQzOTYy._V1_SX300.jpg"
+        },
+        {
+            "Title": "Breaking and Entering",
+            "Year": "2006",
+            "imdbID": "tt0443456",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTI3NzM3NDU4M15BMl5BanBnXkFtZTcwNjYzODgzMQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Breaking In",
+            "Year": "2018",
+            "imdbID": "tt7137846",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNTQwNjc3NjE5MF5BMl5BanBnXkFtZTgwNTEzMDg5NDM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Breaking",
+            "Year": "2022",
+            "imdbID": "tt12311620",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYmRkNWJkNTktMzZmMi00NTg1LWJmYjUtZTQ0ZjMzNmRiMGFhXkEyXkFqcGdeQXVyMTM1MTE1NDMx._V1_SX300.jpg"
+        },
+        {
+            "Title": "Breaking In",
+            "Year": "2011–2012",
+            "imdbID": "tt1630574",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjI1MTUwNjA1N15BMl5BanBnXkFtZTcwMjQ0NTM2Nw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Avatar",
+            "Year": "2009",
+            "imdbID": "tt0499549",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZDA0OGQxNTItMDZkMC00N2UyLTg3MzMtYTJmNjg3Nzk5MzRiXkEyXkFqcGdeQXVyMjUzOTY1NTc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Avatar: The Way of Water",
+            "Year": "2022",
+            "imdbID": "tt1630029",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjQxNTE1MDA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Avatar: The Last Airbender",
+            "Year": "2005–2008",
+            "imdbID": "tt0417299",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BODc5YTBhMTItMjhkNi00ZTIxLWI0YjAtNTZmOTY0YjRlZGQ0XkEyXkFqcGdeQXVyODUwNjEzMzg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Avatar: The Last Airbender",
+            "Year": "2024–",
+            "imdbID": "tt9018736",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTViNTY2MjMtYmUwOC00ZGYxLThjOWEtYjNjZWU3MTYwYzZmXkEyXkFqcGdeQXVyMTEzMTI1Mjk3._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Kings Avatar",
+            "Year": "2019",
+            "imdbID": "tt10732794",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMWU1NDdhNmUtYzk4Ni00MzgxLTk3MDUtMWNiNWQ3ODdhZjZiXkEyXkFqcGdeQXVyMjI2ODE1NTA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Dasham Avatar",
+            "Year": "2023",
+            "imdbID": "tt27561990",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjMxNDBjNmQtZGNjZi00NjkzLWExODgtODQ3YzFjMmIxZjQ4XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Kings Avatar",
+            "Year": "2017–",
+            "imdbID": "tt6859260",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZjIyMjE5ZDYtMTQxNC00NTEzLTgwYzYtMmM0NDg3OWFlYWM5XkEyXkFqcGdeQXVyNjMxNzQ2NTQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Avatar: The Last Airbender - The Legend of Aang",
+            "Year": "2006",
+            "imdbID": "tt0959552",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNjUwNzA5Nzc4N15BMl5BanBnXkFtZTgwNjM1ODY4MDE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Avatar: The Game",
+            "Year": "2009",
+            "imdbID": "tt1517155",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTYxODI2OTI4MF5BMl5BanBnXkFtZTcwNjI1NzMwMw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Avatar: The Last Airbender - The Legend So Far",
+            "Year": "2005",
+            "imdbID": "tt1605838",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZGQ1ZTNmNzItNGYyMC00MDk2LWJiZDAtZTkwZDFlNWJlYTVjXkEyXkFqcGdeQXVyODUxNDExNTg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Mad Max: Fury Road",
+            "Year": "2015",
+            "imdbID": "tt1392190",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BN2EwM2I5OWMtMGQyMi00Zjg1LWJkNTctZTdjYTA4OGUwZjMyXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Road to Perdition",
+            "Year": "2002",
+            "imdbID": "tt0257044",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNjcxMmQ0MmItYTkzYy00MmUyLTlhOTQtMmJmNjE3MDMwYjdlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Road",
+            "Year": "2009",
+            "imdbID": "tt0898367",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTAwNzk4NTU3NDReQTJeQWpwZ15BbWU3MDg3OTEyODI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Revolutionary Road",
+            "Year": "2008",
+            "imdbID": "tt0959337",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTczNDgzMjczOV5BMl5BanBnXkFtZTcwOTU3MzMwMg@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Mad Max 2: The Road Warrior",
+            "Year": "1981",
+            "imdbID": "tt0082694",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BN2VlNjNhZWQtMTY2OC00Y2E1LWJkNGUtMDU4M2ViNzliMGYwXkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Road Trip",
+            "Year": "2000",
+            "imdbID": "tt0215129",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BODA4ZGRhZjgtMTYwMy00MDQzLTkxNTUtYTYwZjE5NDRiZTRjL2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Road House",
+            "Year": "2024",
+            "imdbID": "tt3359350",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNTFiNTMxNTQtM2EzOS00NWNhLWFmNzctNjU5ODIzNDIzMzYzXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Road to El Dorado",
+            "Year": "2000",
+            "imdbID": "tt0138749",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOTEzNWIwMzctOTE1YS00YjIyLTgwZGEtMTMxZDAzNzlmODMxXkEyXkFqcGdeQXVyMjgyMDk1MzY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Road House",
+            "Year": "1989",
+            "imdbID": "tt0098206",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTU1MTE2Mjk2OF5BMl5BanBnXkFtZTcwMTUzNjYzNA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Arlington Road",
+            "Year": "1999",
+            "imdbID": "tt0137363",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZTQ2NDdmYjMtMTA2My00ZTUxLTk5NDItMTQ2OTYzMTI4ODBhXkEyXkFqcGdeQXVyNDAxNjkxNjQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Terminator 2: Judgment Day",
+            "Year": "1991",
+            "imdbID": "tt0103064",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMGU2NzRmZjUtOGUxYS00ZjdjLWEwZWItY2NlM2JhNjkxNTFmXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Terminator",
+            "Year": "1984",
+            "imdbID": "tt0088247",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYTViNzMxZjEtZGEwNy00MDNiLWIzNGQtZDY2MjQ1OWViZjFmXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Terminator 3: Rise of the Machines",
+            "Year": "2003",
+            "imdbID": "tt0181852",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTk5NzM1ODgyN15BMl5BanBnXkFtZTcwMzA5MjAzMw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Terminator Salvation",
+            "Year": "2009",
+            "imdbID": "tt0438488",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BODBlOTJhZjItMGRmYS00YzM1LWFmZTktOTJmNDMyZTBjMjBkXkEyXkFqcGdeQXVyMjMwNDgzNjc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Terminator Genisys",
+            "Year": "2015",
+            "imdbID": "tt1340138",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjM1NTc0NzE4OF5BMl5BanBnXkFtZTgwNDkyNjQ1NTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Terminator: Dark Fate",
+            "Year": "2019",
+            "imdbID": "tt6450804",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzhlYjE5MjMtZDJmYy00MGZmLTgwN2MtZGM0NTk2ZTczNmU5XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Terminator: The Sarah Connor Chronicles",
+            "Year": "2008–2009",
+            "imdbID": "tt0851851",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZGE2ZDgyOWUtNzdiNS00OTI3LTkwZGQtMTMwNzM4YWUxNGNhXkEyXkFqcGdeQXVyNjU2NjA5NjM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Terminator 3: Rise of the Machines",
+            "Year": "2003",
+            "imdbID": "tt0364056",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjA5OTk4MTQwNV5BMl5BanBnXkFtZTgwMzkxNTEwMTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Lady Terminator",
+            "Year": "1989",
+            "imdbID": "tt0095483",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTg5NTA1NzEtNWNiNy00ZTc4LWJhZTgtYmJkODZhYWI3NmQ4XkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Terminator II",
+            "Year": "1989",
+            "imdbID": "tt0098321",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNDNlMWExNTMtMmJkYi00OTg2LTlmY2EtZThjYzA1ZWI2NzFkXkEyXkFqcGdeQXVyMzM4MjM0Nzg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Thor: The Dark World",
+            "Year": "2013",
+            "imdbID": "tt1981115",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTQyNzAwOTUxOF5BMl5BanBnXkFtZTcwMTE0OTc5OQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "World War Z",
+            "Year": "2013",
+            "imdbID": "tt0816711",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNDQ4YzFmNzktMmM5ZC00MDZjLTk1OTktNDE2ODE4YjM2MjJjXkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Jurassic World",
+            "Year": "2015",
+            "imdbID": "tt0369610",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzQ3OTY4NjAtNzM5OS00N2ZhLWJlOWUtYzYwZjNmOWRiMzcyXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Scott Pilgrim vs. the World",
+            "Year": "2010",
+            "imdbID": "tt0446029",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNWI5ODc4MTAtN2U2NC00ZDk3LWE3NjAtNjIyODE2YTlhYjYwXkEyXkFqcGdeQXVyOTA3ODI3NDA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Lost World: Jurassic Park",
+            "Year": "1997",
+            "imdbID": "tt0119567",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMDFlMmM4Y2QtNDg1ZS00MWVlLTlmODgtZDdhYjY5YjdhN2M0XkEyXkFqcGdeQXVyNTI4MjkwNjA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Jurassic World: Fallen Kingdom",
+            "Year": "2018",
+            "imdbID": "tt4881806",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzIxMjYwNDEwN15BMl5BanBnXkFtZTgwMzk5MDI3NTM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Master and Commander: The Far Side of the World",
+            "Year": "2003",
+            "imdbID": "tt0311113",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZGRjM2IyM2EtZDAxYi00NTdjLTliMGYtMmRhZGUyNjRjNWYwXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The End of the F***ing World",
+            "Year": "2017–2019",
+            "imdbID": "tt6257970",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BN2ZhNmQ2MjQtMmQzMi00YjE5LTlkMWMtMjk5YzIxMjk2NDc2XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The World Is Not Enough",
+            "Year": "1999",
+            "imdbID": "tt0143145",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTZiZGY5MjEtNjU3Yi00OGJmLTlkMDAtOGQ5MTY4NDAxMDE0XkEyXkFqcGdeQXVyMTUzMDUzNTI3._V1_SX300.jpg"
+        },
+        {
+            "Title": "Jurassic World Dominion",
+            "Year": "2022",
+            "imdbID": "tt8041270",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOTBjMjA4NmYtN2RjMi00YWZlLTliYTktOTIwMmNkYjYxYmE1XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Wednesday",
+            "Year": "2022–",
+            "imdbID": "tt13443470",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BM2ZmMjEyZmYtOGM4YS00YTNhLWE3ZDMtNzQxM2RhNjBlODIyXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_SX300.jpg"
+        },
+        {
+            "Title": "A Wednesday",
+            "Year": "2008",
+            "imdbID": "tt1280558",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOTcwMzdiMWItMjZlOS00MzAzLTg5OTItNTA4OGYyMjBhMmRiXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Fireworks Wednesday",
+            "Year": "2006",
+            "imdbID": "tt0845439",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTU3MTIzNDA1MV5BMl5BanBnXkFtZTgwNzAwMDY2ODE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Big Wednesday",
+            "Year": "1978",
+            "imdbID": "tt0077235",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNTM1OGYzOGMtNGIxMS00Y2QzLWI4ODAtM2ZmMDk5ZGIxZDA3XkEyXkFqcGdeQXVyMzg1ODEwNQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Ash Wednesday",
+            "Year": "2002",
+            "imdbID": "tt0280438",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTA1OTI2Njc5NzZeQTJeQWpwZ15BbWU2MDE1MTc5OQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Any Wednesday",
+            "Year": "1966",
+            "imdbID": "tt0060112",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOWViMDM3ODEtODNkZC00ZDFmLTkwNDYtOWFkMjMyYjZlMWM2XkEyXkFqcGdeQXVyNzc5MjA3OA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Wednesday, May 9",
+            "Year": "2015",
+            "imdbID": "tt4944924",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BN2IwZWE1ZWQtZDlkOC00ODdlLTg5MDgtZWY5ZTI0YzUxYzc5XkEyXkFqcGdeQXVyMjExMzEyNTM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Ash Wednesday",
+            "Year": "1973",
+            "imdbID": "tt0069736",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOWMyOTM4ODEtMTYwYy00ZmVmLTgxY2YtMWNkYzQxM2RmOTk3XkEyXkFqcGdeQXVyNjc0MzMzNjA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Adult Wednesday Addams",
+            "Year": "2013–2015",
+            "imdbID": "tt3488236",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNmUwZTlkM2QtMjdhOC00YjgzLTg1ZmMtZTlhZDZkOWI3YmY4XkEyXkFqcGdeQXVyNjA3NDc0Mjk@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Bloody Wednesday",
+            "Year": "1987",
+            "imdbID": "tt0088828",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTQ0NzUxNjIxMF5BMl5BanBnXkFtZTcwMDU2NDEzMQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Avengers",
+            "Year": "2012",
+            "imdbID": "tt0848228",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNDYxNjQyMjAtNTdiOS00NGYwLWFmNTAtNThmYjU5ZGI2YTI1XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Avengers: Endgame",
+            "Year": "2019",
+            "imdbID": "tt4154796",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Avengers: Infinity War",
+            "Year": "2018",
+            "imdbID": "tt4154756",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjMxNjY2MDU1OV5BMl5BanBnXkFtZTgwNzY1MTUwNTM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Avengers: Age of Ultron",
+            "Year": "2015",
+            "imdbID": "tt2395427",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTM4OGJmNWMtOTM4Ni00NTE3LTg3MDItZmQxYjc4N2JhNmUxXkEyXkFqcGdeQXVyNTgzMDMzMTg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Avengers",
+            "Year": "1998",
+            "imdbID": "tt0118661",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZTQ4NmIzMTktOTdjOC00NzE4LWIzNTgtODkwNzM5ZjUzZDkxXkEyXkFqcGdeQXVyMTUzMDUzNTI3._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Avengers: Earths Mightiest Heroes",
+            "Year": "2010–2012",
+            "imdbID": "tt1626038",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYzA4ZjVhYzctZmI0NC00ZmIxLWFmYTgtOGIxMDYxODhmMGQ2XkEyXkFqcGdeQXVyNjExODE1MDc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Ultimate Avengers: The Movie",
+            "Year": "2006",
+            "imdbID": "tt0491703",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTYyMjk0NTMwMl5BMl5BanBnXkFtZTgwNzY0NjAwNzE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Avengers",
+            "Year": "1961–1969",
+            "imdbID": "tt0054518",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZWI4ZWM4ZWQtODk1ZC00MzMxLThlZmMtOGFmMTYxZTAwYjc5XkEyXkFqcGdeQXVyMTk0MjQ3Nzk@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Ultimate Avengers II",
+            "Year": "2006",
+            "imdbID": "tt0803093",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZjI3MTI5ZTYtZmNmNy00OGZmLTlhNWMtNjZiYmYzNDhlOGRkL2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Avengers Assemble",
+            "Year": "2012–2019",
+            "imdbID": "tt2455546",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTY0NTUyMDQwOV5BMl5BanBnXkFtZTgwNjAwMTA0MDE@._V1_SX300.jpg"
+        },
+         {
+            "Title": "I, Robot",
+            "Year": "2004",
+            "imdbID": "tt0343818",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNmE1OWI2ZGItMDUyOS00MmU5LWE0MzUtYTQ0YzA1YTE5MGYxXkEyXkFqcGdeQXVyMDM5ODIyNw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Mr. Robot",
+            "Year": "2015–2019",
+            "imdbID": "tt4158110",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMzgxMmQxZjQtNDdmMC00MjRlLTk1MDEtZDcwNTdmOTg0YzA2XkEyXkFqcGdeQXVyMzQ2MDI5NjU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Robot & Frank",
+            "Year": "2012",
+            "imdbID": "tt1990314",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTUzMTE0NTk4Ml5BMl5BanBnXkFtZTcwNjQ1OTMwOA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Robot Chicken",
+            "Year": "2001–2022",
+            "imdbID": "tt0437745",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BM2NlNzE5NjYtMzFhMC00ZTU3LWJlNTktYWI3YjBmN2QyMzM0XkEyXkFqcGdeQXVyMTA0MTM5NjI2._V1_SX300.jpg"
+        },
+        {
+            "Title": "They Call Me Jeeg Robot",
+            "Year": "2015",
+            "imdbID": "tt3775086",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOThjNDQ0ZjUtYWRjYi00ZjBlLWE4MzgtOWM5NGUyNTk2ZWUzL2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyMjQwNzkzODc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Robot Dreams",
+            "Year": "2023",
+            "imdbID": "tt13429870",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMzE4ZDlmNzUtY2QyZS00MmZiLWE1ZTgtOTcyNTEzNmNkODEzXkEyXkFqcGdeQXVyMDA4NzMyOA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "My Life as a Teenage Robot",
+            "Year": "2002–2023",
+            "imdbID": "tt0318233",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYzk2ZjdkMDUtZDZjOS00Y2RlLTk3NzktMGI0OTcyNDJlZjc3XkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Robot Chicken: Star Wars",
+            "Year": "2007",
+            "imdbID": "tt1020990",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNTQ2MDU1MmQtMmM3NC00OWMxLWE5MWItNWUwZTNmNzFlNjY2XkEyXkFqcGdeQXVyMTA0MTM5NjI2._V1_SX300.jpg"
+        },
+        {
+            "Title": "Robot Overlords",
+            "Year": "2014",
+            "imdbID": "tt2145829",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjM1ODc0MDgzNV5BMl5BanBnXkFtZTgwMzcyNzE1NDE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "I am Not a Robot",
+            "Year": "2017–2018",
+            "imdbID": "tt7521778",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZjNlZmUyYmMtNjNjMS00NzQ5LTlmYjktNDVkMmRjMTQyMmVjXkEyXkFqcGdeQXVyNzk0NTA5NQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Dark Knight",
+            "Year": "2008",
+            "imdbID": "tt0468569",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Dark Knight Rises",
+            "Year": "2012",
+            "imdbID": "tt1345836",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTk4ODQzNDY3Ml5BMl5BanBnXkFtZTcwODA0NTM4Nw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Thor: The Dark World",
+            "Year": "2013",
+            "imdbID": "tt1981115",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTQyNzAwOTUxOF5BMl5BanBnXkFtZTcwMTE0OTc5OQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Dark",
+            "Year": "2017–2020",
+            "imdbID": "tt5753856",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOTk2NzUyOTctZDdlMS00MDJlLTgzNTEtNzQzYjFhNjA0YjBjXkEyXkFqcGdeQXVyMjg1NDcxNDE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Transformers: Dark of the Moon",
+            "Year": "2011",
+            "imdbID": "tt1399103",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTkwOTY0MTc1NV5BMl5BanBnXkFtZTcwMDQwNjA2NQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Zero Dark Thirty",
+            "Year": "2012",
+            "imdbID": "tt1790885",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTQ4OTUyNzcwN15BMl5BanBnXkFtZTcwMTQ1NDE3OA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Dark Shadows",
+            "Year": "2012",
+            "imdbID": "tt1077368",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZWJlNTIzYjEtZGU1Ni00MmU0LTk5YzMtZTcxOTYwOGMxYzExXkEyXkFqcGdeQXVyMjg1NDcxNDE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Dark City",
+            "Year": "1998",
+            "imdbID": "tt0118929",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMGExOGExM2UtNWM5ZS00OWEzLTllNzYtM2NlMTJlYjBlZTJkXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "X-Men: Dark Phoenix",
+            "Year": "2019",
+            "imdbID": "tt6565702",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMmZmYTgwZGItNDIxMS00MmRkLWEzODQtYTllNzM0ZWE1NmQ5XkEyXkFqcGdeQXVyODQzNTE3ODc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Terminator: Dark Fate",
+            "Year": "2019",
+            "imdbID": "tt6450804",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzhlYjE5MjMtZDJmYy00MGZmLTgwN2MtZGM0NTk2ZTczNmU5XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Sherlock",
+            "Year": "2010–2017",
+            "imdbID": "tt1475582",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNTQzNGZjNDEtOTMwYi00MzFjLWE2ZTYtYzYxYzMwMjZkZDc5XkEyXkFqcGc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Sherlock Holmes",
+            "Year": "2009",
+            "imdbID": "tt0988045",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTg0NjEwNjUxM15BMl5BanBnXkFtZTcwMzk0MjQ5Mg@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Sherlock Holmes: A Game of Shadows",
+            "Year": "2011",
+            "imdbID": "tt1515091",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTQwMzQ5Njk1MF5BMl5BanBnXkFtZTcwNjIxNzIxNw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Sherlock Jr.",
+            "Year": "1924",
+            "imdbID": "tt0015324",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZWFhOGU5NDctY2Q3YS00Y2VlLWI1NzEtZmIwY2ZiZjY4OTA2XkEyXkFqcGdeQXVyMDI2NDg0NQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Adventures of Sherlock Holmes",
+            "Year": "1984–1985",
+            "imdbID": "tt0086661",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMmQ0MmI3YjktNDlkNi00YTBkLTk5OGItNjhkNmM1NGI1M2IwXkEyXkFqcGdeQXVyMTA0MTM5NjI2._V1_SX300.jpg"
+        },
+        {
+            "Title": "Young Sherlock Holmes",
+            "Year": "1985",
+            "imdbID": "tt0090357",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNmE0NTQ5ZjItN2MzNC00NjBhLTg0ZjYtYzFiMzFlMjhjNmNiXkEyXkFqcGdeQXVyNDk3NzU2MTQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Sherlock Gnomes",
+            "Year": "2018",
+            "imdbID": "tt2296777",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTc2NjUzODMxMF5BMl5BanBnXkFtZTgwMzMwMDIzNDM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Return of Sherlock Holmes",
+            "Year": "1986–1988",
+            "imdbID": "tt0090509",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYTU5NGZmMTgtZTJmNi00MjU1LTlkZTItMDBlYjI3OWU0NWZkXkEyXkFqcGdeQXVyMTk0MjQ3Nzk@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Private Life of Sherlock Holmes",
+            "Year": "1970",
+            "imdbID": "tt0066249",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNTg2ODQyOGQtNWVhMi00MDI2LTg3OTktZjA4MTJmYzQwYTFjXkEyXkFqcGdeQXVyNjc1NTYyMjg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Memoirs of Sherlock Holmes",
+            "Year": "1994",
+            "imdbID": "tt0108855",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTYzMzEzMTM4Ml5BMl5BanBnXkFtZTcwMTY2NDYyMQ@@._V1_SX300.jpg"
+        },
+         {
+            "Title": "The Walking Dead",
+            "Year": "2010–2022",
+            "imdbID": "tt1520211",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzI5MjUyYTEtMTljZC00NGI5LWFhNWYtYjY0ZTQ5YmEzMWRjXkEyXkFqcGdeQXVyMTY3MDE5MDY1._V1_SX300.jpg"
+        },
+        {
+            "Title": "Fear the Walking Dead",
+            "Year": "2015–2023",
+            "imdbID": "tt3743822",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZWQ2NGZhMTktMzJjZi00ZTNjLTljZjMtMzU0ODU1OWNhOTY1XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_SX300.jpg"
+        },
+        {
+            "Title": "Walking Tall",
+            "Year": "2004",
+            "imdbID": "tt0351977",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTM0MjYzNzM1N15BMl5BanBnXkFtZTcwMDcwNDc3NA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Dead Man Walking",
+            "Year": "1995",
+            "imdbID": "tt0112818",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTM3NzA1MjM2N15BMl5BanBnXkFtZTcwMzY3MTMzNA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Chaos Walking",
+            "Year": "2021",
+            "imdbID": "tt2076822",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYTcxYTk3MWQtZThlMS00ZjQ0LTg0NjktNGVkNWM2MTAyYWJmXkEyXkFqcGdeQXVyMTEyMjM2NDc2._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Walking Dead: The Ones Who Live",
+            "Year": "2024",
+            "imdbID": "tt9859436",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYjc3YWM3MjctZDAzNy00OWY4LTkwNjMtMWM2YTg1ZWRlMDAwXkEyXkFqcGdeQXVyMTY3MDE5MDY1._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Walking Dead: Dead City",
+            "Year": "2023–",
+            "imdbID": "tt18546730",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMzczNjBlYmYtMjEwYi00MzJhLWFkOTUtNjViNzEzMGM5YWJmXkEyXkFqcGdeQXVyMTMzOTQyOTk1._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Walking Dead: Daryl Dixon",
+            "Year": "2023–",
+            "imdbID": "tt13062500",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYmU2MGMyNzQtMmQ1Mi00ZjQ0LThhNDYtN2I3N2M4NTgyMDc3XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_SX300.jpg"
+        },
+        {
+            "Title": "Still Walking",
+            "Year": "2008",
+            "imdbID": "tt1087578",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMmNjYmNkNzUtYzNmMC00NWMzLWEyMWYtNmQ2NTRhNzI2OGIzXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Walking Dead: World Beyond",
+            "Year": "2020–2021",
+            "imdbID": "tt10148174",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BODEzZjAwOGMtMWZkZC00Nzg1LTlmNDUtNDU5NDA5YmViOTMwXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_SX300.jpg"
+        },
+         {
+            "Title": "The Witcher",
+            "Year": "2019–",
+            "imdbID": "tt5180504",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMDEwOWVlY2EtMWI0ZC00OWVmLWJmZGItYTk3YjYzN2Y0YmFkXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Witcher: Nightmare of the Wolf",
+            "Year": "2021",
+            "imdbID": "tt11657662",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BY2IwNjM0ODktYTZkNy00ZTA0LWEzMWYtMDE3ZDg0YmI3YzQ3XkEyXkFqcGdeQXVyMTEzMTI1Mjk3._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Witcher: Blood Origin",
+            "Year": "2022",
+            "imdbID": "tt12785720",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYWRlODk4ODQtY2VhYy00ZWNhLWIxMTAtMGI1MjE5YWNmMzE3XkEyXkFqcGdeQXVyNTE1NjY5Mg@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Witcher 3: Wild Hunt - Blood and Wine",
+            "Year": "2016",
+            "imdbID": "tt5667286",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTg2ZmY0MGUtZmFjZS00YjkxLTlmMWEtMDE0ZWQwYzBlODA2XkEyXkFqcGdeQXVyMzUwNzgzNzg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Witcher 3: Wild Hunt - Hearts of Stone",
+            "Year": "2015",
+            "imdbID": "tt5547960",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYTQ2YjVjNzMtMDNiZS00MmIwLTgzNDEtMGY3ZGIwMWI4ZjNjXkEyXkFqcGdeQXVyMzUwNzgzNzg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Witcher 2: Assassins of Kings",
+            "Year": "2011",
+            "imdbID": "tt1937416",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOWE2MmU4YjEtM2U0Mi00NmI4LWE5NGItMzhhMjc2ZjYwNjViXkEyXkFqcGdeQXVyOTQxNzM2MjY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Witcher 3: Wild Hunt - A Night to Remember",
+            "Year": "2015",
+            "imdbID": "tt5091902",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNDU4YzJjMTAtMzBlOS00ZTBmLWEyNGYtZjM0NDkzNzg0ZDMwXkEyXkFqcGdeQXVyNTU0NDgwMzA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Witcher",
+            "Year": "2007",
+            "imdbID": "tt1135081",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTBlMDk3MDktZTFkZC00YjkzLTkwMWUtYmRlNjYwMzJmNzRmXkEyXkFqcGdeQXVyOTQxNzM2MjY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Making the Witcher",
+            "Year": "2020",
+            "imdbID": "tt12987838",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNmE2ZmQ3MjgtMjI5Yi00OTBmLWEyMWEtMDUwZmRhNjM3ZDRiXkEyXkFqcGdeQXVyMjk2MTQxMzg@._V1_SX300.jpg"
+        },
+         {
+            "Title": "Chernobyl",
+            "Year": "2019",
+            "imdbID": "tt7366338",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNTdkN2QwMDItMDVhNS00ZjFiLWEzNTctMzY5ODQzYWNkMDllXkEyXkFqcGdeQXVyMTMzNDExODE5._V1_SX300.jpg"
+        },
+        {
+            "Title": "Chernobyl Diaries",
+            "Year": "2012",
+            "imdbID": "tt1991245",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzkwNDkyNTUxNV5BMl5BanBnXkFtZTcwODY1NTE3Nw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Chernobyl: Abyss",
+            "Year": "2021",
+            "imdbID": "tt10648714",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMDE3ODIzMTgtOWM0My00NzI0LTliMTUtMzUxMGNhZTgxZDIzXkEyXkFqcGdeQXVyNjcxMTIwNzU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Chernobyl: The Lost Tapes",
+            "Year": "2022",
+            "imdbID": "tt13913326",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNWQ4MGM3NDItYzA2OS00MmI4LTgwY2MtOThiZTZjZjExODhkXkEyXkFqcGdeQXVyNjEwNTM2Mzc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "S.T.A.L.K.E.R.: Shadow of Chernobyl",
+            "Year": "2007",
+            "imdbID": "tt0936494",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BY2M1ZmExN2EtMDVkNS00MzgzLWJjM2MtMzZjM2RhYTg1MjRjXkEyXkFqcGdeQXVyNzg3NjQyOQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Battle of Chernobyl",
+            "Year": "2006",
+            "imdbID": "tt1832484",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZGI4NjYzYjItZmIwYy00YTMzLWI1ZjctYWQ5MDFlMzRmMjgzXkEyXkFqcGdeQXVyMzkxNjQ1Mw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Chernobyl: Zone of Exclusion",
+            "Year": "2014–2017",
+            "imdbID": "tt4032214",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzhiN2M0MTUtMmUyNC00M2Y0LWJiZDQtNjA3Y2MxYzEwNDRhXkEyXkFqcGdeQXVyNDM1ODc2NzE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Babushkas of Chernobyl",
+            "Year": "2015",
+            "imdbID": "tt3299704",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTJjZWUzNDMtNTUxZC00M2U3LTkxMDgtODJiNmE3NTU2MzVjXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Chernobyl Heart",
+            "Year": "2003",
+            "imdbID": "tt0396959",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYTdkMjc5Y2UtM2NkZS00NzA4LTlkZmUtMThhMmZkZmEzN2E0XkEyXkFqcGdeQXVyNjExODE1MDc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "After Chernobyl",
+            "Year": "2021",
+            "imdbID": "tt2243377",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYjA1OWE4ZTAtMTQwYi00NGVlLTk3YmQtOWI2NWRkZWYxYjVhXkEyXkFqcGdeQXVyNjgzODU3NjE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Inside Look: The People v. O.J. Simpson - American Crime Story",
+            "Year": "2016",
+            "imdbID": "tt6205862",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYTgyZmYzM2YtZDQ3YS00ODJhLWIyYzEtN2QzYjA5YTZjZGM0XkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Murder of Nicole Brown Simpson",
+            "Year": "2019",
+            "imdbID": "tt8415352",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNWNhODlhOGItZDQ1OC00NjgyLWE0ZjItZjQ3OWUyYmMwYjU1XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Maggie Simpson in Rogue Not Quite One",
+            "Year": "2023",
+            "imdbID": "tt27658815",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZmQ2MzM1Y2UtZGQ0YS00MTViLTllZjktYjI3YWRhMGRhN2JiXkEyXkFqcGdeQXVyMTMzOTQyOTk1._V1_SX300.jpg"
+        },
+        {
+            "Title": "Kardashian: The Man Who Saved OJ Simpson",
+            "Year": "2016",
+            "imdbID": "tt5787108",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYzViNjY3YzItZDE0OC00NWQ0LWIxMDQtYTNjZjA0NzgxNTk0XkEyXkFqcGdeQXVyMTQxNDI4ODE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Edward & Mrs. Simpson",
+            "Year": "1978",
+            "imdbID": "tt0080212",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNmI0Y2EzNDYtOWU1NC00ZGQzLWEzOTMtMGJkOTVkMWQ4MTlmXkEyXkFqcGdeQXVyNjg1NzcwODE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Bart Simpson: Do the Bartman",
+            "Year": "1990",
+            "imdbID": "tt1889386",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZDE4ZmU1MGItZjJiMS00Yjc5LTkzMjktMDlkOGFhY2Y4N2NlXkEyXkFqcGdeQXVyNjMxNzQ2NTQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Happy Birthday, Toby Simpson",
+            "Year": "2017",
+            "imdbID": "tt3950032",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMGIxMTFjNDYtMjBjZC00NTEzLWI1MTgtZWI4NTI0ZmNmNmE2XkEyXkFqcGdeQXVyNjc4MDIyMjE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The O.J. Simpson Story",
+            "Year": "1995",
+            "imdbID": "tt0114023",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTQyMjI2NDA2N15BMl5BanBnXkFtZTcwNTIzOTYxMQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Ashlee Simpson Show",
+            "Year": "2004–",
+            "imdbID": "tt0414719",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMGZkYTk1MTctMGY1OC00ZDY4LTk3NTMtMTYwMWRjZDdjZTIxXkEyXkFqcGdeQXVyMjgzMzAzMjE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Game of Thrones",
+            "Year": "2011–2019",
+            "imdbID": "tt0944947",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BN2IzYzBiOTQtNGZmMi00NDI5LTgxMzMtN2EzZjA1NjhlOGMxXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Imitation Game",
+            "Year": "2014",
+            "imdbID": "tt2084970",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNjI3NjY1Mjg3MV5BMl5BanBnXkFtZTgwMzk5MDQ3MjE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Squid Game",
+            "Year": "2021–",
+            "imdbID": "tt10919420",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYWE3MDVkN2EtNjQ5MS00ZDQ4LTliNzYtMjc2YWMzMDEwMTA3XkEyXkFqcGdeQXVyMTEzMTI1Mjk3._V1_SX300.jpg"
+        },
+        {
+            "Title": "Deadpool",
+            "Year": "2016",
+            "imdbID": "tt1431045",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYzE5MjY1ZDgtMTkyNC00MTMyLThhMjAtZGI5OTE1NzFlZGJjXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Deadpool 2",
+            "Year": "2018",
+            "imdbID": "tt5463162",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTQ0NTk2MTYtMWZlYS00ZTliLThmZTEtNDVkODgxNmQ2ZGM2XkEyXkFqcGdeQXVyNTc4MjczMTM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Deadpool & Wolverine",
+            "Year": "2024",
+            "imdbID": "tt6263850",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzRiMjg0MzUtNTQ1Mi00Y2Q5LWEwM2MtMzUwZDU5NmVjN2NkXkEyXkFqcGc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Deadpool: No Good Deed",
+            "Year": "2017",
+            "imdbID": "tt6612630",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BODAxNDFhNGItMzdiMC00NDM1LWExYWUtZjNiMGIzYTc0MTM5XkEyXkFqcGdeQXVyMjYzMjA3NzI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Deadpool",
+            "Year": "2013",
+            "imdbID": "tt2269724",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNjQ2OGI1ZjQtZWE5Yy00ZDQ3LThiZWYtNjU0OGUyOTU3NjZmXkEyXkFqcGdeQXVyNjU1OTg4OTM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Gettin Wet on Wet with Deadpool 2",
+            "Year": "2017",
+            "imdbID": "tt7636826",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjZiMmYwNWQtNzUzOS00MTVmLTg2NDQtZmY3MjNjYzUzZTJmXkEyXkFqcGdeQXVyNTE1NjY5Mg@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Deadpools Maximum Reactions: Korg and Deadpool",
+            "Year": "2021",
+            "imdbID": "tt15041304",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZjY2NjlhYzEtODk1Ni00MWI1LTk4MDctY2RjOWU3YWVkZmYyXkEyXkFqcGdeQXVyMTEyNzgwMDUw._V1_SX300.jpg"
+        },
+        {
+            "Title": "Once Upon a Deadpool",
+            "Year": "2018",
+            "imdbID": "tt31050020",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMDc5ZDliZjYtNzY4Yi00YTAwLTkxN2MtNjlkMzA3MzAxMWJmXkEyXkFqcGdeQXVyMTA1NjE5MTAz._V1_SX300.jpg"
+        },
+        {
+            "Title": "Deadpool",
+            "Year": "2013",
+            "imdbID": "tt2622240",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOWNhMGFjZjAtMDQ0Yi00MjMxLTkwYjgtMjc4MzE3NDQ2NzExXkEyXkFqcGdeQXVyNTA0OTU0OTQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Deadpool: The Musical",
+            "Year": "2017",
+            "imdbID": "tt6693444",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYzEyOTU1MDYtZjg3ZS00OWE1LWIwYTMtN2E4OTA1MzE5MmY3XkEyXkFqcGdeQXVyMTkyNzc0MA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Mission: Impossible - Fallout",
+            "Year": "2018",
+            "imdbID": "tt4912910",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNjRlZmM0ODktY2RjNS00ZDdjLWJhZGYtNDljNWZkMGM5MTg0XkEyXkFqcGdeQXVyNjAwMjI5MDk@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Fallout",
+            "Year": "2024–",
+            "imdbID": "tt12637874",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZjQ0YjAyNWQtMjRjMC00NzMxLTlkNjEtYWQzNmQwNGRlMGJkXkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Fallout",
+            "Year": "2021",
+            "imdbID": "tt11847410",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjM2MTg0MDUtZTMwOS00MTk3LTkzZWQtOTQ0ODY4MTI3MTMxXkEyXkFqcGdeQXVyMTM1MTE1NDMx._V1_SX300.jpg"
+        },
+        {
+            "Title": "Fallout 3",
+            "Year": "2008",
+            "imdbID": "tt1073664",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMzM3ODA4MTg2OV5BMl5BanBnXkFtZTgwOTQwMzc1MDE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Fallout 4",
+            "Year": "2015",
+            "imdbID": "tt4741306",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZDU1MzViNDEtNGNhMC00MDQ2LWI1NzItNzZmYWNlODkxMWZlXkEyXkFqcGdeQXVyNjgyODQ1Mzk@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Fallout: New Vegas",
+            "Year": "2010",
+            "imdbID": "tt1706601",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZWQ0ZDEyYjUtNmE1My00ZmU2LWFlNjAtZDEyMDc4YjAyM2U5XkEyXkFqcGdeQXVyNjgyOTk3MTA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Fallout 2: A Post-Nuclear Role-Playing Game",
+            "Year": "1998",
+            "imdbID": "tt0183066",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYzczZWJiOTAtMDZjYS00ZmZhLWE4YmUtOTgxYmZiZDk1YzRiXkEyXkFqcGdeQXVyNzg3NjQyOQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Fallout: A Post-Nuclear Role-Playing Game",
+            "Year": "1997",
+            "imdbID": "tt0134648",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjE0MjU5NTQyMl5BMl5BanBnXkFtZTgwNDUyODI4MDE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Fallout: Nuka Break",
+            "Year": "2011–",
+            "imdbID": "tt2056910",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTg2ODkyMjQwNF5BMl5BanBnXkFtZTcwMjkzMTA3OQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Fallout 76",
+            "Year": "2018",
+            "imdbID": "tt8495446",
+            "Type": "game",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZDg3ZTlhM2UtZDkyOS00YTUwLTk4NmMtYTRmMmMzN2YzMWEwXkEyXkFqcGdeQXVyNzQzNDM3NTI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Peaky Blinders",
+            "Year": "2013–2022",
+            "imdbID": "tt2442560",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZjYzZDgzMmYtYjY5Zi00YTk1LThhMDYtNjFlNzM4MTZhYzgyXkEyXkFqcGdeQXVyMTE5NDQ1MzQ3._V1_SX300.jpg"
+        },
+        {
+            "Title": "Blind Wave: Peaky Blinders Reaction",
+            "Year": "2018–",
+            "imdbID": "tt11108846",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYmY4OGVmNTItZDE3Mi00NjY4LWE1NzEtYTc5YjVkYmFhN2U5XkEyXkFqcGdeQXVyNjU1OTg4OTM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Peaky Blinders: Ramberts the Redemption of Thomas Shelby",
+            "Year": "2024",
+            "imdbID": "tt30788520",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZTE2OWUyOGUtZDFlZi00N2IyLWE1OWEtZmZkNTdlODJhNTU2XkEyXkFqcGdeQXVyNTA1MjYyNzE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "À la manière de - Peaky Blinders",
+            "Year": "2018",
+            "imdbID": "tt9030330",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNTY3ZmYzMDktNjQ5MS00ZDg3LTlhMTMtMzIzMDZkYjBhMjI1XkEyXkFqcGdeQXVyODg2NjAzMTg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Peaky Bleeders",
+            "Year": "2019",
+            "imdbID": "tt10303736",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMDU1MWM1YmEtYjc1Yi00MDIxLWI0ZGItNjdkMTIzMDhiZjQzXkEyXkFqcGdeQXVyMjkxMDcwODg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "The Church Up Peaky Road",
+            "Year": "2020",
+            "imdbID": "tt13578026",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYmM3N2ZkMWYtYjY0Zi00NDhjLWFlNjUtNzljYWYyMmM2MDgwXkEyXkFqcGdeQXVyMzgxMzQzNzY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Recep Ivedik",
+            "Year": "2008",
+            "imdbID": "tt1193516",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYzRkZTNhMDctODU5Zi00MjA3LTgxMjYtMGQ3MDI1MzBkOTM5XkEyXkFqcGdeQXVyMjExNjgyMTc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Recep Ivedik 2",
+            "Year": "2009",
+            "imdbID": "tt1373215",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BY2M1NGY5MWYtMmJkYi00MDg4LWI5MTYtMDNlODc0MDMwOGZmXkEyXkFqcGdeQXVyNTM3NzExMDQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Recep Ivedik 3",
+            "Year": "2010",
+            "imdbID": "tt1577061",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZjEwOTNlZjYtNTVlMS00M2Q5LTk0YmQtMWIzZDI4ODIyODlkXkEyXkFqcGdeQXVyNTM3NzExMDQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Recep Ivedik 4",
+            "Year": "2014",
+            "imdbID": "tt3477064",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTk1NTA1MjAyN15BMl5BanBnXkFtZTgwMjM2MDkzMTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Recep Ivedik 5",
+            "Year": "2017",
+            "imdbID": "tt6439558",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjE2NWRhNDctNmM0OS00ZGY3LWJiMDktNjljMWYxNzU5NzYxL2ltYWdlXkEyXkFqcGdeQXVyNjE5MjkyNTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Recep Ivedik 6",
+            "Year": "2019",
+            "imdbID": "tt7399138",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZDRhNDBhNTgtMmNiMy00MzdjLWE1YWMtY2E0MTBmYWEzYjQ4XkEyXkFqcGdeQXVyOTM4NDAxMjA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Recep Ivedik 7",
+            "Year": "2022",
+            "imdbID": "tt19759204",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYjY5NGI0NzQtZTEyZC00MTkxLTk1NjktMDEyYjY1YTA0OGE1XkEyXkFqcGdeQXVyMTA5OTAyNzM2._V1_SX300.jpg"
+        },
+        {
+            "Title": "Ve Recep ve Zehra ve Ayse",
+            "Year": "1983",
+            "imdbID": "tt0495001",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNmEzZWFiMTYtNzgxZS00OWZkLWFhMzYtMjExNTQ4OWY5Njg3XkEyXkFqcGdeQXVyODMyODMxNDY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Kuduz Recep",
+            "Year": "1967",
+            "imdbID": "tt0277085",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMGQ5NzdhZmQtNDljOS00YTEzLTkzMDMtNzZiY2MzNzI5MjQ4L2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyNjkzNDQ5MTg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Kasimpasali Recep",
+            "Year": "1965",
+            "imdbID": "tt0289256",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYmQ4YTY5NTUtYmU1Ni00MGE1LTgyOGEtNDJkY2MwNGE1NDQ5XkEyXkFqcGdeQXVyNjkzNDQ5MTg@._V1_SX300.jpg"
+        },
+            {
+            "Title": "Kurtlar Vadisi: Irak",
+            "Year": "2006",
+            "imdbID": "tt0493264",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMDIxNjUzMjQtM2Y2YS00ZDVhLWE1MWEtMjZlZjVkNzZhYmZjXkEyXkFqcGdeQXVyOTQ2MjQ3MTI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Kurtlar Vadisi: Filistin",
+            "Year": "2011",
+            "imdbID": "tt1784499",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjEzOTY1MjAzOV5BMl5BanBnXkFtZTcwNTg2ODQzNA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Kurtlar Vadisi: Terör",
+            "Year": "2007",
+            "imdbID": "tt0949686",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOGY0NDYxM2MtZjMxMC00ZmU3LWExMzgtMzU3NzBiMWUwYThkXkEyXkFqcGdeQXVyNjUwOTk3NDM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Deli Dumrul: Kurtlar Kuslar Aleminde",
+            "Year": "2010",
+            "imdbID": "tt1587135",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNjM0ZWNjZTYtNzIwNi00Nzc4LWIyN2MtZTEwZTE0OTRlYTA1XkEyXkFqcGdeQXVyMjc0MjUzMzU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Aç Kurtlar",
+            "Year": "1969",
+            "imdbID": "tt0192993",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNWYxNTg2NGQtZDY3Ny00OGNlLTgwZTktODRkZTY0ZjU3ZTk3XkEyXkFqcGdeQXVyMTA1MzE1MjA4._V1_SX300.jpg"
+        },
+        {
+            "Title": "Ihtiyar Kurtlar",
+            "Year": "2019",
+            "imdbID": "tt11504936",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZWZlODNjNDUtNTRlMi00YTU3LWIzYjQtZjYwZDUxNWVhMDA3XkEyXkFqcGdeQXVyMzE0NjYyNDQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Kurtlar ve Çakallar",
+            "Year": "2018",
+            "imdbID": "tt6608720",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZDI1ZDFkMWMtYzQwZS00NTZiLTg4NmQtNTJiM2UyYjVlYzZkXkEyXkFqcGdeQXVyODY1MDkwOQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Mekansiz kurtlar",
+            "Year": "1968",
+            "imdbID": "tt0345643",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYzNlZDI4MzktYmQ2MC00ZGZmLThkY2YtMmVmZTZiYTliMjlmL2ltYWdlXkEyXkFqcGdeQXVyNjkzNDQ5MTg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Ezel",
+            "Year": "2009–2011",
+            "imdbID": "tt1534360",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjIzOTY1YTYtNmRhMC00MzAxLWEzMzUtM2ZiMmYwNTY0MjMyXkEyXkFqcGdeQXVyNDg4MjkzNDk@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Titanic",
+            "Year": "1997",
+            "imdbID": "tt0120338",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMDdmZGU3NDQtY2E5My00ZTliLWIzOTUtMTY4ZGI1YjdiNjk3XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Titanic II",
+            "Year": "2010",
+            "imdbID": "tt1640571",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTMxMjQ1MjA5Ml5BMl5BanBnXkFtZTcwNjIzNjg1Mw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Titanic",
+            "Year": "1953",
+            "imdbID": "tt0046435",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTU3NTUyMTc3Nl5BMl5BanBnXkFtZTgwOTA2MDE3MTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Titanic",
+            "Year": "1996",
+            "imdbID": "tt0115392",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTBhMjUzMDItYTBlZS00OThkLWJmZDQtMjg1YTQ5ZDkxYmFjXkEyXkFqcGdeQXVyNjk1Njg5NTA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Titanic",
+            "Year": "2012",
+            "imdbID": "tt1869152",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTA4MjIyZWEtZjYwMS00ZmQ1LWJiMDEtMWNiNTI5NWE3OGJjXkEyXkFqcGdeQXVyNjk1Njg5NTA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Titanic 666",
+            "Year": "2022",
+            "imdbID": "tt18394428",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzcxY2RjOWUtZmE2Yy00YTBlLWE4N2UtOTg5NjdiNTFjNzk1XkEyXkFqcGc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Titanic: Blood and Steel",
+            "Year": "2012",
+            "imdbID": "tt1695366",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjI2MzU2NzEzN15BMl5BanBnXkFtZTcwMzI5NTU3Nw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Dirilis: Ertugrul",
+            "Year": "2014–2019",
+            "imdbID": "tt4320258",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTYwM2Y5NzMtMzQzZC00YTE5LTlmYzctMzc2M2E5NGQ2YjFjXkEyXkFqcGdeQXVyNTM3NzExMDQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Doktorlar",
+            "Year": "2006–2011",
+            "imdbID": "tt0953931",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYjhmODliYzItZTY0Yi00ZmU3LWFhMGItNTQxM2E0ZGEyN2ExXkEyXkFqcGdeQXVyODY1MDkwOQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Adanali",
+            "Year": "2008–2010",
+            "imdbID": "tt1428614",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZWVkZTYwOTItYzU0Yy00ODI2LTkxNjAtYjNhNmM0NDRlOWU2XkEyXkFqcGdeQXVyNDQ2MTMzODA@._V1_SX300.jpg"
+        }, 
+        {
+            "Title": "Selena",
+            "Year": "2006–2009",
+            "imdbID": "tt0862622",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZWVkZTYwOTItYzU0Yy00ODI2LTkxNjAtYjNhNmM0NDRlOWU2XkEyXkFqcGdeQXVyNDQ2MTMzODA@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Leyla ile Mecnun: Kaytariyor",
+            "Year": "2011",
+            "imdbID": "tt2194904",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BODM1ZTliYzEtOTA5Yi00MmZjLTg3NDYtYmI4YjA0NGU5Y2M3XkEyXkFqcGdeQXVyNTM3NzExMDQ@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Nefes: Vatan Sagolsun",
+            "Year": "2009",
+            "imdbID": "tt1171701",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjE2NjEyMDg0M15BMl5BanBnXkFtZTcwODYyODg5Mg@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Nefes: Yer Eksi Iki",
+            "Year": "2023",
+            "imdbID": "tt21941216",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZTZjNjNjNjMtZGM4My00MWUyLWEzNWYtMGZlNDkxZDMxZmVlXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_SX300.jpg"
+        },
+        {
+            "Title": "G.O.R.A.",
+            "Year": "2004",
+            "imdbID": "tt0384116",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjE0MTY2MDI3NV5BMl5BanBnXkFtZTcwNTc1MzEzMQ@@._V1_SX300.jpg"
+        },
+         {
+            "Title": "Eyyvah Eyvah",
+            "Year": "2010",
+            "imdbID": "tt1594918",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjA3MDM3OTAxNF5BMl5BanBnXkFtZTcwNTcyODY5Ng@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Eyyvah Eyvah 2",
+            "Year": "2011",
+            "imdbID": "tt1801051",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTY3MTA0NjMzMV5BMl5BanBnXkFtZTcwNjcyODY5Ng@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Eyyvah Eyvah 3",
+            "Year": "2014",
+            "imdbID": "tt3478046",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTU2NTcwNTU4NF5BMl5BanBnXkFtZTgwMzY0OTEyMTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Eyvah Karim",
+            "Year": "2018",
+            "imdbID": "tt8183594",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZTRhOWUzYzAtMTQwYy00ZDkyLWEwMjYtZjY0Y2VkZDgxMGViXkEyXkFqcGdeQXVyMzUxOTQ2NDU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Eyvah Kizim Büyüdü",
+            "Year": "2000–2001",
+            "imdbID": "tt0868097",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZDYxYTdmMTUtYTc4MC00NDU4LTkwYTgtMDI3ZDFhMGFiNGJhXkEyXkFqcGdeQXVyMjExNjgyMTc@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Eyvah Babam",
+            "Year": "1998–2000",
+            "imdbID": "tt9056884",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNmY1OGEyMTUtODRiYy00NTJiLWJiMzItYjU2M2E2MWY1NzZhXkEyXkFqcGdeQXVyNDIwOTkyNjM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Eyvah",
+            "Year": "1970",
+            "imdbID": "tt0274493",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTA4YmE0Y2QtZDYzYi00ZmZkLWE3M2QtNmVhYjQ1ZDhmNTE1XkEyXkFqcGdeQXVyNTczMjA3ODg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Dag",
+            "Year": "2010–2015",
+            "imdbID": "tt1711386",
+            "Type": "series",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjAzODI5ODYyNl5BMl5BanBnXkFtZTgwNDkzNjkxNzE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Ayla",
+            "Year": "2017",
+            "imdbID": "tt4044896",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BODU3YTkzMGQtNzE4YS00NTQ3LWExYzAtZDRjZWY3ZmQ2NzBiXkEyXkFqcGdeQXVyMzQwMjc0NTU@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Ayla Belgeseli: Vuslat",
+            "Year": "2021",
+            "imdbID": "tt13909928",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzAwNWI1MDctNDY4NC00OTBhLTg4Y2MtMWNiYTQ3YThiZTRhXkEyXkFqcGdeQXVyNDg4MjkzNDk@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Müslüm",
+            "Year": "2018",
+            "imdbID": "tt7832124",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNWEzZmFjOWMtNjZmNS00ODY2LTg3NjctOTc4MjI2NzA4MmZmXkEyXkFqcGdeQXVyMTYzMDkwNjg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Müslüm Babanin Evlatlari",
+            "Year": "2014",
+            "imdbID": "tt3747074",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BYzhjNDJlM2YtY2JiNS00YjMxLWIzZTUtM2ZkZTk4ZTNkMTNjXkEyXkFqcGdeQXVyMjI3MDczMjI@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Harry Potter and the Deathly Hallows: Part 2",
+            "Year": "2011",
+            "imdbID": "tt1201607",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMGVmMWNiMDktYjQ0Mi00MWIxLTk0N2UtN2ZlYTdkN2IzNDNlXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Harry Potter and the Sorcerers Stone",
+            "Year": "2001",
+            "imdbID": "tt0241527",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNmQ0ODBhMjUtNDRhOC00MGQzLTk5MTAtZDliODg5NmU5MjZhXkEyXkFqcGdeQXVyNDUyOTg3Njg@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Harry Potter and the Prisoner of Azkaban",
+            "Year": "2004",
+            "imdbID": "tt0304141",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTY4NTIwODg0N15BMl5BanBnXkFtZTcwOTc0MjEzMw@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Harry Potter and the Chamber of Secrets",
+            "Year": "2002",
+            "imdbID": "tt0295297",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMjE0YjUzNDUtMjc5OS00MTU3LTgxMmUtODhkOThkMzdjNWI4XkEyXkFqcGdeQXVyMTA3MzQ4MTc0._V1_SX300.jpg"
+        },
+        {
+            "Title": "Harry Potter and the Goblet of Fire",
+            "Year": "2005",
+            "imdbID": "tt0330373",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTI1NDMyMjExOF5BMl5BanBnXkFtZTcwOTc4MjQzMQ@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Harry Potter and the Order of the Phoenix",
+            "Year": "2007",
+            "imdbID": "tt0373889",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOTA3MmRmZDgtOWU1Ny00ZDc5LWFkN2YtNzNlY2UxZmY0N2IyXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Harry Potter and the Deathly Hallows: Part 1",
+            "Year": "2010",
+            "imdbID": "tt0926084",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BMTQ2OTE1Mjk0N15BMl5BanBnXkFtZTcwODE3MDAwNA@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Harry Potter and the Half-Blood Prince",
+            "Year": "2009",
+            "imdbID": "tt0417741",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNzU3NDg4NTAyNV5BMl5BanBnXkFtZTcwOTg2ODg1Mg@@._V1_SX300.jpg"
+        },
+        {
+            "Title": "Harry Potter 20th Anniversary: Return to Hogwarts",
+            "Year": "2022",
+            "imdbID": "tt16116174",
+            "Type": "movie",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BZWRlMjI2YzgtOTRiOC00NTMwLTgyNDctMWY0ZGUzNzUxYmYzXkEyXkFqcGdeQXVyNzAwMjU2MTY@._V1_SX300.jpg"
+        }
+  ]'));
+}
+
+//Butonlar için fonksiyon
+void Gecisler
+{
+  panel = uAnaSayfa.AddNewProPanel(uAnaSayfa,'panel');
+  clComponent.SetupComponent(panel,'{"Align" : "alMostBottom","Width" :360, 
+  "Height":50,"RoundHeight":10,"RoundWidth":10,"Backgroundcolor": "#ffffff"}');
+  panel.Align = alMostBottom;
+  
+  btn1 = uAnaSayfa.AddNewProButton(panel, 'btn1', '');
+  clComponent.SetupComponent(btn1,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/ljHlx6e.png","ImgFit":"yes"
+  }');
+  btn1.Margins.Right = 290;
+
+  
+  btn2 = uAnaSayfa.AddNewProButton(panel, 'btn2', '');
+  clComponent.SetupComponent(btn2,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/uhb99IV.png","ImgFit":"yes"
+  }');
+  btn2.Margins.Right = 145;
+  uAnaSayfa.AddNewEvent(btn2,tbeOnClick,'GotoFragmanliFilm');
+  
+  
+  btn3 = uAnaSayfa.AddNewProButton(panel, 'btn3', '');
+  clComponent.SetupComponent(btn3,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/DokOV7t.png","ImgFit":"yes"
+  }');
+  btn3.Margins.Left = 0;
+  uAnaSayfa.AddNewEvent(btn3,tbeOnClick,'GotoTiyatro');
+  
+  
+  btn4 = uAnaSayfa.AddNewProButton(panel, 'btn4', '');
+  clComponent.SetupComponent(btn4,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/kPWYntB.png","ImgFit":"yes"
+  }');
+  btn4.Margins.Left = 145;
+  uAnaSayfa.AddNewEvent(btn4,tbeOnClick,'GotoRating');
+  
+  
+  btn5 = uAnaSayfa.AddNewProButton(panel, 'btn5', '');
+  clComponent.SetupComponent(btn5,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/ILHO3MM.png","ImgFit":"yes"
+  }');
+  btn5.Margins.Left = 290;
+  uAnaSayfa.AddNewEvent(btn5,tbeOnClick,'GotoKanallar');
+}
+//Arama yapmak için fonksiyon
+void Arama
+{
+  searchEdt = uAnaSayfa.AddNewProSearchEdit(uAnaSayfa,'searchEdt','Film arayın...');
+  searchEdt.Align = alTop;
+  searchEdt.Margins.Top = 5;
+  searchEdt.Margins.Left = 5;
+  searchEdt.Margins.Right = 5;
+  searchEdt.Margins.Bottom = 5;
+  searchEdt.Height = 40;
+}
+
+{
+  uAnaSayfa = TclForm.Create(Self);
+  uDetay = TclUnit.Create; 
+  uFragmanliFilm = TclUnit.Create;
+  uKanallar = TclUnit.Create;
+  uRating = TclUnit.Create;
+  uTiyatro = TclUnit.Create;
+  
+  uAnaSayfa.SetFormBGImage('https://i.imgur.com/Wu9O9uO.png');
+  
+  Arama;
+  
+  CreateListView;
+  CreateDesignerPanel;
+  CreateData;
+  veriAl;
+  
+  Gecisler;
+  
+  uAnaSayfa.Run;
+}

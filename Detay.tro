@@ -1,0 +1,206 @@
+var
+ uDetay:TCLForm;
+ clRest:TclRest;
+ qry:TCLJSONQuery;
+ qryString:String;
+ DesignerPanel : TClListViewDesignerPanel;
+ listView:TClProListView;
+ Title,Director,Actors,Plot,Country,DVD,imdbRating,BoxOffice:TClProLabel;
+ Poster:TClProImage;
+ gonder : String;
+
+    
+//verileri API'den almak için fonksiyon
+void veriAl;
+{
+
+   gonder = Clomosy.GlobalVariableString;
+     
+   clRest=TCLRest.Create;
+   clRest.BaseURL = 'https://api.collectapi.com/imdb/imdbSearchById?movieId='+gonder;
+   clRest.Accept = 'application/json';
+   clRest.Method = rmGET;
+   clRest.AddHeader('Authorization',''); 
+   clRest.Execute;
+    
+    
+    
+    
+   
+   qry= Clomosy.ClDataSetFromJSON(clRest.Response);
+    with qry do
+     {
+      qryString=FieldByName('result').AsString;
+     }
+
+     
+     qry= Clomosy.ClDataSetFromJSON(qryString);
+    with qry do
+     {
+      qryString=FieldByName('Title').AsString;
+     }
+     
+}
+
+
+
+//listview oluşturma
+ void CreateListView
+{
+  listView = uDetay.AddNewProListView(uDetay,'listView');
+  listView.clProSettings.ItemSpace = 10;     
+  listView.clProSettings.IsFill = True;
+  listView.Height = uDetay.clheight*95/100;
+
+  listView.clProSettings.IsRound = True;
+
+  listView.Align=alBottom;
+  listView.clProSettings.RoundHeight = 5;
+  listView.clProSettings.RoundWidth = 5;
+  listView.clProSettings.BorderColor =clAlphaColor.clHexToColor('#f3aa44');
+  listView.clProSettings.BorderWidth = 2;
+  listView.clProSettings.ItemHeight = 705;
+  listView.clProSettings.ColCount = 1;
+  listView.SetclProSettings(listView.clProSettings);
+  
+}
+
+
+
+void CreateDesignerPanel
+{
+  DesignerPanel = uDetay.AddNewProListViewDesignerPanel(listView, 'DesignerPanel');
+  
+  clComponent.SetupComponent(DesignerPanel, 
+  '{"Height":75,
+    "BackgroundColor":"#B3FCE5",
+    "RoundHeight":20,
+    "RoundWidth":20}');
+    listView.SetDesignerPanel(DesignerPanel);
+    
+}
+//verileri listviewe yerleştirme
+void CreateData;
+{ 
+ 
+     
+  Title = uDetay.AddNewProLabel(DesignerPanel, 'Title', '');
+  Title.clProSettings.FontVertAlign = palLeading;
+  Title.Align=alTop;
+  Title.Margins.Top=5;
+  Title.Margins.Left=5;
+  Title.clProSettings.AutoSize=True;
+  Title.clProSettings.WordWrap=True;
+  Title.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  Title.SetclProSettings(Title.clProSettings);
+  DesignerPanel.AddPanelObject(Title, clCaption);
+  
+     
+  Director = uDetay.AddNewProLabel(DesignerPanel, 'Director', '');
+  Director.clProSettings.FontVertAlign = palLeading;
+  Director.Align=alTop;
+  Director.Margins.Top=5;
+  Director.Margins.Left=5;
+  Director.clProSettings.AutoSize=True;
+  Director.clProSettings.WordWrap=True;
+  Director.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  Director.SetclProSettings(Director.clProSettings);
+  DesignerPanel.AddPanelObject(Director , clText);
+  
+  Actors = uDetay.AddNewProLabel(DesignerPanel, 'Actors', '');
+  Actors.clProSettings.FontVertAlign = palLeading;
+  Actors.Align=alTop;
+  Actors.Margins.Top=5;
+  Actors.Margins.Left=5;
+  Actors.clProSettings.AutoSize=True;
+  Actors.clProSettings.WordWrap=True;
+  Actors.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  Actors.SetclProSettings(Actors.clProSettings);
+  DesignerPanel.AddPanelObject(Actors, clText1);   
+  
+  Plot = uDetay.AddNewProLabel(DesignerPanel, 'Plot', '');
+  Plot.clProSettings.FontVertAlign = palLeading;
+  Plot.Align=alTop;
+  Plot.Margins.Top=5;
+  Plot.Margins.Left=5;
+  Plot.clProSettings.AutoSize=True;
+  Plot.clProSettings.WordWrap=True;
+  Plot.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  Plot.SetclProSettings(Plot.clProSettings);
+  DesignerPanel.AddPanelObject(Plot, clText2);   
+  
+  Country = uDetay.AddNewProLabel(DesignerPanel, 'Country', '');
+  Country.clProSettings.FontVertAlign = palLeading;
+  Country.Align=alTop;
+  Country.Margins.Top=5;
+  Country.Margins.Left=5;
+  Country.clProSettings.AutoSize=True;
+  Country.clProSettings.WordWrap=True;
+  Country.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  Country.SetclProSettings(Country.clProSettings);
+  DesignerPanel.AddPanelObject(Country, clText3);   
+  
+  DVD = uDetay.AddNewProLabel(DesignerPanel, 'DVD', '');
+  DVD.clProSettings.FontVertAlign = palLeading;
+  DVD.Align=alTop;
+  DVD.Margins.Top=5;
+  DVD.Margins.Left=5;
+  DVD.clProSettings.AutoSize=True;
+  DVD.clProSettings.WordWrap=True;
+  DVD.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  DVD.SetclProSettings(DVD.clProSettings);
+  DesignerPanel.AddPanelObject(DVD, clText4);   
+  
+  imdbRating = uDetay.AddNewProLabel(DesignerPanel, 'imdbRating', '');
+  imdbRating.clProSettings.FontVertAlign = palLeading;
+  imdbRating.Align=alTop;
+  imdbRating.Margins.Top=5;
+  imdbRating.Margins.Left=5;
+  imdbRating.clProSettings.AutoSize=True;
+  imdbRating.clProSettings.WordWrap=True;
+  imdbRating.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  imdbRating.SetclProSettings(imdbRating.clProSettings);
+  DesignerPanel.AddPanelObject(imdbRating, clText5);   
+  
+  BoxOffice = uDetay.AddNewProLabel(DesignerPanel, 'BoxOffice', '');
+  BoxOffice.clProSettings.FontVertAlign = palLeading;
+  BoxOffice.Align=alTop;
+  BoxOffice.Margins.Top=5;
+  BoxOffice.Margins.Left=5;
+  BoxOffice.clProSettings.AutoSize=True;
+  BoxOffice.clProSettings.WordWrap=True;
+  BoxOffice.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  BoxOffice.SetclProSettings(BoxOffice.clProSettings);
+  DesignerPanel.AddPanelObject(BoxOffice, clText6);   
+  
+  Poster = uDetay.AddNewProImage(DesignerPanel, 'Poster');
+  Poster.Align=alBottom;
+  Poster.Margins.Left=5;
+  Poster.Height = 345;
+  Poster.Width = 555;
+  Poster.SetclProSettings(Poster.clProSettings);
+  DesignerPanel.AddPanelObject(Poster, clImage1);
+
+
+}
+//listviewe json verilerini yukleme 
+ void listViewVeriEkle;
+ {
+  listView.clLoadProListViewDataFromDataset(Clomosy.ClDataSetFromJSON(qry.GetJSONString));
+ }
+ 
+{
+ uDetay = TCLForm.Create(Self);
+ uDetay.SetFormBGImage('https://i.imgur.com/Wu9O9uO.png');
+ veriAl;
+ 
+ CreateListView;
+ CreateDesignerPanel;
+ CreateData;
+ listViewVeriEkle;
+ 
+ 
+ 
+ uDetay.Run;
+
+}

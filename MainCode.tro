@@ -1,0 +1,31 @@
+
+
+var 
+  AnimasyonForm:TCLGameForm;
+  timer : TCLTimer;
+  uAnaSayfa : TclUnit;
+  i:Integer;
+  //AnaSayfaya gitmek için
+  void GoToAnaSayfa;
+  {
+    if(i == 0)
+    {
+    Clomosy.RunUnit('AnaSayfa');
+    i=i+1;
+    }
+  }
+  
+  
+ 
+{ 
+  i=0;
+  AnimasyonForm = TCLGameForm.Create(Self); 
+  uAnaSayfa = TclUnit.Create;
+  timer = AnimasyonForm.AddNewTimer(AnimasyonForm,'timer', 1000);
+  timer.Enabled = True;
+  AnimasyonForm.AddNewEvent(timer,tbeOnTimer,'GoToAnaSayfa');
+  
+  AnimasyonForm.SetFormBGImage('https://i.imgur.com/Wu9O9uO.png'); 
+
+  AnimasyonForm.Run; 
+} 

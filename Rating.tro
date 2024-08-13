@@ -1,0 +1,234 @@
+
+var
+ uRating:TCLForm;
+ clRest:TclRest;
+ qry:TCLJSONQuery;
+ qryString:String;
+ 
+ DesignerPanel : TClListViewDesignerPanel;
+ listView:TClProListView;
+ rating,kanal,name1 : TClProLabel;
+ image : TClProImage;
+ uFragmanliFilm,uAnaSayfa,uKanallar,uTiyatro : TclUnit;
+ btn1,btn2,btn3,btn4,btn5 : TClProButton;
+ panel: TclProPanel;
+
+//API den verileri almak için
+void Verial;
+{
+
+  clRest=TCLRest.Create;
+  clRest.BaseURL = 'https://api.collectapi.com/watching/seriesRating';
+  clRest.Accept = 'application/json';
+  clRest.Method = rmGET;
+  clRest.AddHeader('Authorization',''); 
+  clRest.Execute;
+    
+    
+    
+    
+   
+    qry= Clomosy.ClDataSetFromJSON(clRest.Response);
+    with qry do
+     {
+      qryString=FieldByName('result').AsString;
+     }
+
+    qry= Clomosy.ClDataSetFromJSON(qryString);
+    with qry do
+     {
+      qryString=FieldByName('name').AsString;
+     }
+
+     
+}
+
+ 
+  
+//listview oluşturma
+ void CreateListView
+{
+  listView = uRating.AddNewProListView(uRating,'listView');
+  listView.clProSettings.ItemSpace = 10;     
+  listView.clProSettings.IsFill = True;
+  listView.Height = uRating.clheight*85/100;
+
+  listView.clProSettings.IsRound = True;
+
+  listView.Align=alBottom;
+  listView.clProSettings.RoundHeight = 5;
+  listView.clProSettings.RoundWidth = 5;
+  listView.clProSettings.BorderColor =clAlphaColor.clHexToColor('#f3aa44');
+  listView.clProSettings.BorderWidth = 2;
+  listView.clProSettings.ItemHeight = 95;
+  listView.clProSettings.ColCount = 1;
+  listView.SetclProSettings(listView.clProSettings);
+}
+
+
+
+void CreateDesignerPanel
+{
+  DesignerPanel = uRating.AddNewProListViewDesignerPanel(listView, 'DesignerPanel');
+  
+  clComponent.SetupComponent(DesignerPanel, 
+  '{"Height":75,
+    "BackgroundColor":"#B3FCE5",
+    "RoundHeight":20,
+    "RoundWidth":20}');
+    listView.SetDesignerPanel(DesignerPanel);
+    
+    
+}
+//verileri listviewe yerleştirme
+void CreateData;
+{ 
+ 
+
+  kanal = uRating.AddNewProLabel(DesignerPanel, 'kanal', '');
+  kanal.clProSettings.FontVertAlign = palLeading;
+  kanal.Align=alTop;
+  kanal.Margins.Top=5;
+  kanal.Margins.Left=5;
+  kanal.clProSettings.AutoSize=True;
+  kanal.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  kanal.SetclProSettings(kanal.clProSettings);
+  DesignerPanel.AddPanelObject(kanal, clText1);
+
+  
+  
+  rating = uRating.AddNewProLabel(DesignerPanel, 'rating', '');
+  rating.clProSettings.FontVertAlign = palLeading;
+  rating.Align=alTop;
+  rating.Margins.Top=5;
+  rating.Margins.Left=5;
+  rating.clProSettings.AutoSize=True;
+  rating.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  rating.SetclProSettings(rating.clProSettings);
+  DesignerPanel.AddPanelObject(rating, clText2);
+
+  
+  name1 = uRating.AddNewProLabel(DesignerPanel, 'name', '');
+  name1.clProSettings.FontVertAlign = palLeading;
+  name1.Align=alTop;
+  name1.Margins.Top=5;
+  name1.Margins.Left=5;
+  name1.clProSettings.AutoSize=True;
+  name1.clProSettings.FontColor =clAlphaColor.clHexToColor('#000000');
+  name1.SetclProSettings(name1.clProSettings);
+  DesignerPanel.AddPanelObject(name1, clText3);
+
+
+}
+//listviewe json verilerini yukleme 
+ void listViewVeriEkle;
+ {
+  listView.clLoadProListViewDataFromDataset(Clomosy.ClDataSetFromJSON(qry.GetJSONString));
+ }
+ 
+  //Anasayfaya giden fonksiyon
+ void GotoAnaSayfa
+ {
+    uRating.clShow;
+    uAnaSayfa.UnitName = 'AnaSayfa';
+    uAnaSayfa.CallerForm = uRating;
+    uAnaSayfa.Run;
+ }
+
+
+ //Fragmanlı Film sayfasına gitmek için
+ void GotoFragmanliFilm
+ {
+    uRating.clShow;
+    uFragmanliFilm.UnitName = 'FragmanliFilm';
+    uFragmanliFilm.CallerForm = uRating;
+    uFragmanliFilm.Run;
+ }
+
+ //Kanallar sayfasına gitmek için
+ void GotoKanallar
+ {
+    uRating.clShow;
+    uKanallar.UnitName = 'Kanallar';
+    uKanallar.CallerForm = uRating;
+    uKanallar.Run;
+ }
+
+ //Tiyatro sayfasına gitmek için
+ void GotoTiyatro
+ {
+    uRating.clShow;
+    uTiyatro.UnitName = 'Tiyatro';
+    uTiyatro.CallerForm = uRating;
+    uTiyatro.Run;
+ }
+  
+//Butonlar için fonksiyon
+void Gecisler
+{
+  panel = uRating.AddNewProPanel(uRating,'panel');
+  clComponent.SetupComponent(panel,'{"Align" : "alMostBottom","Width" :360, 
+  "Height":50,"RoundHeight":10,"RoundWidth":10,"Backgroundcolor": "#ffffff"}');
+  panel.Align = alMostBottom;
+  
+  btn1 = uRating.AddNewProButton(panel, 'btn1', '');
+  clComponent.SetupComponent(btn1,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/ljHlx6e.png","ImgFit":"yes"
+  }');
+  btn1.Margins.Right = 290;
+  uRating.AddNewEvent(btn1,tbeOnClick,'GotoAnaSayfa');
+  
+  btn2 = uRating.AddNewProButton(panel, 'btn2', '');
+  clComponent.SetupComponent(btn2,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/uhb99IV.png","ImgFit":"yes"
+  }');
+  btn2.Margins.Right = 145;
+  uRating.AddNewEvent(btn2,tbeOnClick,'GotoFragmanliFilm');
+  
+  
+  btn3 = uRating.AddNewProButton(panel, 'btn3', '');
+  clComponent.SetupComponent(btn3,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/DokOV7t.png","ImgFit":"yes"
+  }');
+  btn3.Margins.Left = 0;
+  uRating.AddNewEvent(btn3,tbeOnClick,'GotoTiyatro');
+  
+  
+  btn4 = uRating.AddNewProButton(panel, 'btn4', '');
+  clComponent.SetupComponent(btn4,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/kPWYntB.png","ImgFit":"yes"
+  }');
+  btn4.Margins.Left = 145;
+  
+  
+  btn5 = uRating.AddNewProButton(panel, 'btn5', '');
+  clComponent.SetupComponent(btn5,'{"RoundHeight":10,"Width":69,"Height":45,"Backgroundcolor":"#ffffff",
+ "RoundWidth":10,"BorderColor":"#8e8fde","BorderWidth":2,"Imgurl":"https://i.imgur.com/ILHO3MM.png","ImgFit":"yes"
+  }');
+  btn5.Margins.Left = 290;
+  uRating.AddNewEvent(btn5,tbeOnClick,'GotoKanallar');
+  
+}
+ 
+
+{
+ uRating = TCLForm.Create(Self);
+ uRating.SetFormBGImage('https://i.imgur.com/Wu9O9uO.png');
+ uAnaSayfa = TclUnit.Create; 
+ uFragmanliFilm = TclUnit.Create;
+ uKanallar = TclUnit.Create;
+ uTiyatro = TclUnit.Create;
+ 
+ Verial;
+ 
+ CreateListView;
+ CreateDesignerPanel;
+ CreateData;
+ listViewVeriEkle;
+ 
+ 
+ Gecisler;
+ 
+ uRating.Run;
+
+}

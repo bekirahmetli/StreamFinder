@@ -1,0 +1,14 @@
+var 
+ uFragman:TclForm; 
+ xWeb:TclWebBrowser; 
+ uGonder : String; 
+//Tıklanan film ile alakalı fragmanlara gitme
+{ 
+ uFragman = TclForm.Create(Self); 
+ uFragman.SetFormBGImage('https://i.imgur.com/Wu9O9uO.png');
+ uGonder = Clomosy.GlobalVariableString; 
+ xWeb = uFragman.AddNewWebBrowser(uFragman,'xWeb');   
+ xWeb.Align = alClient; 
+ xWeb.Navigate(uGonder); 
+ uFragman.Run; 
+} 

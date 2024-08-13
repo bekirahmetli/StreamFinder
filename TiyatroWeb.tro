@@ -1,0 +1,14 @@
+var 
+ uTiyatroWeb:TclForm; 
+ xWeb:TclWebBrowser; 
+ uGonder : String; 
+
+{ 
+ uTiyatroWeb = TclForm.Create(Self); 
+ uTiyatroWeb.SetFormBGImage('https://i.imgur.com/Wu9O9uO.png');
+ uGonder = Clomosy.GlobalVariableString; 
+ xWeb = uTiyatroWeb.AddNewWebBrowser(uTiyatroWeb,'xWeb');   
+ xWeb.Align = alClient; 
+ xWeb.Navigate(uGonder); 
+ uTiyatroWeb.Run; 
+} 
